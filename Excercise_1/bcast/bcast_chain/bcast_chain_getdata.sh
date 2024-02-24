@@ -1,14 +1,15 @@
 #!/bin/bash
+
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=24
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
-#SBATCH --job-name=HPC_ex01
+#SBATCH --job-name=HPC_ex01_bcast_chain
 #SBATCH --exclusive
 #SBATCH --exclude=fat[001-002]
 
 # Load the openMPI module
-module load openMPI/4.1.5/gnu
+module load openMPI/4.1.5/icc/2021.7.1
 export OMPI_MCA_pml=ucx
 
 # Define the range of np values
