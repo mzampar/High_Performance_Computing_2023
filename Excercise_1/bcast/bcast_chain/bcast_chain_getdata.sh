@@ -10,7 +10,6 @@
 
 # Load the openMPI module
 module load openMPI/4.1.5/icc/2021.7.1
-export OMPI_MCA_pml=ucx
 
 # Define the range of np values
 np_values=$(seq 2 1 48)
