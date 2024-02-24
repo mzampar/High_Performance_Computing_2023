@@ -16,7 +16,7 @@ np_values=$(seq 2 1 48)
 map_values="core socket node"
 
 # Define filepaths
-src_path="../../osu-micro-benchmarks-7.3/c/mpi/collective/blocking/"
+src_path="/u/dssc/mzampar/.local/modules/libexec/osu-micro-benchmarks/mpi/collective/"
 out_csv="../results_bcast/bcast_linear.csv"
 
 # Create the CSV file with header
