@@ -7,9 +7,7 @@
 #SBATCH --exclusive
 #SBATCH --exclude=fat[001-002]
 
-# Load the openMPI module
-module load openMPI/4.1.5/gnu
-export OMPI_MCA_pml=ucx
+
 # Define the range of np values
 np_values=$(seq 2 1 48)
 # Define the range of map values
