@@ -30,6 +30,6 @@ for map in $map_values; do
     # Run the mpirun command
     echo "   Benchmarking Pipeline with map=$map and np=$np"
     mpirun -np $np -map-by $map --mca coll_tuned_use_dynamic_rules true --mca coll_tuned_bcast_algorithm 3 ${src_path}osu_bcast -x 1000 -i 10000 | tail -n 21 \
-    | awk -v np="$np" -v map="$map" '{printf "Linear,%s,%s,%s,%s\n",map,np,$1, $2}' | sed 's/,$//' >> $out_csv
+    | awk -v np="$np" -v map="$map" '{printf "Pipeline,%s,%s,%s,%s\n",map,np,$1, $2}' | sed 's/,$//' >> $out_csv
   done
 done
