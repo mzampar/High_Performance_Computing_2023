@@ -11,3 +11,6 @@ wget https://mvapich.cse.ohio-state.edu/download/mvapich/osu-micro-benchmarks-7.
 ./configure —prefix=/u/dssc/mzampar/.local/modules CC=/opt/programs/openMPI/4.1.5/bin/mpicc CXX=/opt/programs/openMPI/4.1.5/bin/mpicxx
 
 
+
+cd bcast/bcast_linear
+sbatch bcast_linear_getdata.sh

@@ -6,6 +6,7 @@
 #SBATCH --partition=THIN
 #SBATCH --job-name=HPC_ex01_bcast_binarytree
 #SBATCH --exclusive
+#SBATCH -A dssc
 #SBATCH --exclude=fat[001-002]
 
 # Load the openMPI module
@@ -27,7 +28,7 @@ echo "Algorithm,Allocation,Processes,MessageSize,Latency" > $out_csv
 for map in $map_values; do
   for np in $np_values; do
     # Run the mpirun command
-    echo "...Benchmarking BinaryTree with map=$map and np=$np..."
+    echo "   Benchmarking BinaryTree with map=$map and np=$np"
     mpirun -np $np -map-by $map --mca coll_tuned_use_dynamic_rules true --mca coll_tuned_bcast_algorithm 5 ${src_path}osu_bcast -x 1000 -i 10000 | tail -n 21 \
     | awk -v np="$np" -v map="$map" '{printf "BinaryTree,%s,%s,%s,%s\n",map,np,$1, $2}' | sed 's/,$//' >> $out_csv
   done
