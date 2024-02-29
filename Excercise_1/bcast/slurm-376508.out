@@ -1,0 +1,13 @@
+Loading compiler version 2022.2.1
+Loading tbb version 2021.7.1
+Loading compiler-rt version 2022.2.1
+Loading oclfpga version 2022.2.1
+  Load "debugger" to debug DPC++ applications with the gdb-oneapi debugger.
+  Load "dpl" for additional DPC++ APIs: https://github.com/oneapi-src/oneDPL
+   Benchmarking Chain with map=core and np=2
+   Benchmarking Chain with map=core and np=3
+   Benchmarking Chain with map=core and np=4
+   Benchmarking Chain with map=core and np=5
+   Benchmarking Chain with map=core and np=6
+   Benchmarking Chain with map=core and np=7
+slurmstepd: error: *** JOB 376508 ON thin002 CANCELLED AT 2024-02-28T19:13:16 ***
