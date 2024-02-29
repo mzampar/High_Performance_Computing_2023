@@ -15,11 +15,11 @@ module load openMPI/4.1.5/icc/2021.7.1
 # Define the range of np values
 np_values=$(seq 2 1 48)
 # Define the range of map values
-map_values="core socket node"
+map_values="socket node" # tolto core per time limit
 
 # Define filepaths
 src_path="/u/dssc/mzampar/.local/modules/libexec/osu-micro-benchmarks/mpi/collective/"
-out_csv="/u/dssc/mzampar/hpc_project/Excercise_1/bcast/results/bcast_pipeline.csv"
+out_csv="/u/dssc/mzampar/hpc_project/Excercise_1/bcast/results/bcast_pipeline_socket_node.csv"
 
 # Create the CSV file with header
 echo "Algorithm,Allocation,Processes,MessageSize,Latency" > $out_csv
