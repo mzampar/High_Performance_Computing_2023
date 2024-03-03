@@ -16,4 +16,4 @@ module load openMPI/4.1.5/icc/2021.7.1
 mpicc -o main mandelbrot_omp.c -lm -fopenmp
 
 # Run the compiled executable
-srun -n 24 ./main 10000 10000 -2 -2 2 2 10000 
+srun -n 24 ./main 10000 10000 -2.0 -2.0 2.0 2.0 10000 
