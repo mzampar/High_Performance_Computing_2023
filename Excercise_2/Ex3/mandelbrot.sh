@@ -20,4 +20,4 @@ export OMP_NUM_THREADS=24
 gcc -o ./build/main mandelbrot_omp.c -lm -fopenmp
 
 # Run the program
-./build/main 10000 10000 -2.0 -2.0 2.0 2.0 10000
+./build/main 10000 10000 10000 10000 -2.25 -1.5 0.75 1.5 10000
