@@ -19,8 +19,8 @@ export OMP_NUM_THREADS=24
 gcc -o ./build/main_half mandelbrot_half_omp.c -lm -fopenmp
 
 # Define pixel and iteration parameters
-pixel_values=(5000 7500 10000)   # Example pixel values
-iteration_values=(5000 7500 10000)   # Example iteration values
+pixel_values=(5000 7500 10000 15000)
+iteration_values=(5000 7500 10000 15000)
 
 # Output file for storing results
 out_csv="./results/mandelbrot_half_execution_times.csv"

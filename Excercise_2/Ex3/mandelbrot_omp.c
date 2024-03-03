@@ -69,8 +69,7 @@ int main(int argc, char *argv[]) {
     fprintf(pgmimg, "%d %d\n", nx, ny);  
   
     // Writing the maximum gray value 
-    fprintf(pgmimg, "90\n");  
-    short int temp = 0; 
+    fprintf(pgmimg, "90\n");
     for (int i = 0; i < ny; i++) { 
         for (int j = 0; j < nx; j++) { 
             fprintf(pgmimg, "%d ", matrix[i*nx + j]); 
