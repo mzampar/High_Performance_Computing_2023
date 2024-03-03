@@ -23,7 +23,6 @@ int mandelbrot(double cr, double ci, int max_iterations) {
 }
 
 
-// Main function to generate the Mandelbrot set image
 int main(int argc, char *argv[]) {
     if (argc != 8) {
         printf("Usage: %s nx ny x_L y_L x_R y_R I_max\n", argv[0]);
@@ -38,14 +37,12 @@ int main(int argc, char *argv[]) {
     double y_R = atof(argv[6]);  // Upper bound of the complex plane
     int I_max = atoi(argv[7]);  // Maximum number of iterations
 
+    // Allocate memory for the upper half of the Mandelbrot set
+    short int *upper_half = malloc(nx * (ny / 2) * sizeof(short int));
 
-
-    // Allocate memory for the matrix of short ints
-    short int *matrix = malloc(ny * nx * sizeof(short int));
- 
-    // OpenMP parallel region to compute Mandelbrot set
+    // OpenMP parallel region to compute Mandelbrot set for the upper half
     #pragma omp parallel for collapse(2) schedule(dynamic)
-    for (int j = 0; j < ny; j++) {
+    for (int j = 0; j < ny / 2; j++) {
         for (int i = 0; i < nx; i++) {
             // Calculate complex point corresponding to current pixel
             double cr = x_L + (x_R - x_L) * i / (nx - 1);
@@ -54,36 +51,48 @@ int main(int argc, char *argv[]) {
             // Compute Mandelbrot iteration for the current point
             int iter = mandelbrot(cr, ci, I_max);
 
-            matrix[j * nx + i] = (iter < I_max) ? iter : 0;
+            upper_half[j * nx + i] = (iter < I_max) ? iter : 0;
         }
     }
 
+    // Write the Mandelbrot set image to a PGM file
+    FILE *pgmimg = fopen("figures/mandelbrot_half.pgm", "wb");
+    if (pgmimg == NULL) {
+        printf("Error: Unable to open file.\n");
+        exit(1);
+    }
 
-    FILE* pgmimg; 
-    pgmimg = fopen("figures/mandelbrot.pgm", "wb"); 
-  
-    // Writing Magic Number to the File 
-    fprintf(pgmimg, "P2\n");  
-  
-    // Writing Width and Height 
-    fprintf(pgmimg, "%d %d\n", nx, ny);  
-  
-    // Writing the maximum gray value 
-    fprintf(pgmimg, "90\n");  
-    short int temp = 0; 
-    for (int i = 0; i < ny; i++) { 
-        for (int j = 0; j < nx; j++) { 
-            fprintf(pgmimg, "%d ", matrix[i*nx + j]); 
-        } 
-        fprintf(pgmimg, "\n"); 
-    } 
+    // Writing Magic Number to the File
+    fprintf(pgmimg, "P2\n");
+
+    // Writing Width and Height
+    fprintf(pgmimg, "%d %d\n", nx, ny);
+
+    // Writing the maximum gray value
+    fprintf(pgmimg, "90\n");
+
+    // Write the upper half
+    for (int i = 0; i < ny / 2; i++) {
+        for (int j = 0; j < nx; j++) {
+            fprintf(pgmimg, "%d ", upper_half[i * nx + j]);
+        }
+        fprintf(pgmimg, "\n");
+    }
+
+    // Write the mirrored lower half in reverse order
+    for (int i = ny / 2 - 1; i >= 0; i--) {
+        for (int j = 0; j < nx; j++) {
+            fprintf(pgmimg, "%d ", upper_half[i * nx + j]);
+        }
+        fprintf(pgmimg, "\n");
+    }
+
     fclose(pgmimg);
-    printf("Image written \n");
-
-
 
     // Free allocated memory
-    free(matrix);
+    free(upper_half);
+
+    printf("Image written.\n");
 
     return 0;
 }
