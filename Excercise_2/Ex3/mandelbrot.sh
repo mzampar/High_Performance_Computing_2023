@@ -19,7 +19,7 @@ module load intel/oneapi
 export OMP_NUM_THREADS=24
 
 # Compile the program
-gcc -o main mandelbrot_omp.c -lm -fopenmp
+gcc -o ./build/main mandelbrot_omp.c -lm -fopenmp
 
 # Run the program
-./mandelbrot_omp 10000 10000 -2.0 -2.0 2.0 2.0 10000
+./build/main 10000 10000 -2.0 -2.0 2.0 2.0 10000
