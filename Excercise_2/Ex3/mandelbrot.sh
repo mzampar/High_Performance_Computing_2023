@@ -12,8 +12,6 @@
 # Load necessary modules
 
 module load openMPI/4.1.5/icc/2021.7.1
-module load gcc/11.2.0
-module load intel/oneapi
 
 # Set environment variables
 export OMP_NUM_THREADS=24
