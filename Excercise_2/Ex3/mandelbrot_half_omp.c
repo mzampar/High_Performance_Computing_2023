@@ -70,23 +70,21 @@ int main(int argc, char *argv[]) {
 
     // Writing the maximum gray value
     fprintf(pgmimg, "90\n");
-    
-    #pragma omp parallel for schedule(dynamic)
-    for (int i = 0; i < ny; i++) {
-        // Write upper half
-        if (i < ny / 2) {
-            for (int j = 0; j < nx; j++) {
-                fprintf(pgmimg, "%d ", upper_half[i * nx + j]);
-            }
-            fprintf(pgmimg, "\n");
+
+    // Write the upper half
+    for (int i = 0; i < ny / 2; i++) {
+        for (int j = 0; j < nx; j++) {
+            fprintf(pgmimg, "%d ", upper_half[i * nx + j]);
         }
-        // Write mirrored lower half
-        else {
-            for (int j = nx - 1; j >= 0; j--) {
-                fprintf(pgmimg, "%d ", upper_half[(ny - i - 1) * nx + j]);
-            }
-            fprintf(pgmimg, "\n");
+        fprintf(pgmimg, "\n");
+    }
+
+    // Write the mirrored lower half in reverse order
+    for (int i = ny / 2 - 1; i >= 0; i--) {
+        for (int j = 0; j < nx; j++) {
+            fprintf(pgmimg, "%d ", upper_half[i * nx + j]);
         }
+        fprintf(pgmimg, "\n");
     }
 
     fclose(pgmimg);
