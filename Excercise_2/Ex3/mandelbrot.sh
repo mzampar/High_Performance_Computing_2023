@@ -9,11 +9,17 @@
 #SBATCH -A dssc
 #SBATCH --exclude=fat[001-002]
 
-# Load the openMPI module
+# Load necessary modules
+
 module load openMPI/4.1.5/icc/2021.7.1
+module load gcc/11.2.0
+module load intel/oneapi
 
-# Compile the Mandelbrot_omp.c file
-mpicc -o main mandelbrot_omp.c -lm -fopenmp
+# Set environment variables
+export OMP_NUM_THREADS=24
 
-# Run the compiled executable
-srun -n 24 ./main 10000 10000 -2.0 -2.0 2.0 2.0 10000 
+# Compile the program
+gcc -o main mandelbrot_omp.c -lm -fopenmp
+
+# Run the program
+./mandelbrot_omp 10000 10000 -2.0 -2.0 2.0 2.0 10000
