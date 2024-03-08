@@ -1,2 +1,3 @@
-build/
 figures/
+build/
+*.out
