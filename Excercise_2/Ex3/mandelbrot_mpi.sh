@@ -33,7 +33,7 @@ for pixels in "${pixel_values[@]}"; do
     # Loop over iteration values
     for iterations in "${iteration_values[@]}"; do
         # Run the program and capture execution time
-        execution_time=$( { time -p ./build/mandelbrot_mpi $pixels $pixels -2.25 -1.5 0.75 1.5 $iterations 2>&1; } 2>&1 | grep real | awk '{print $2}' )
+        execution_time=$( { time -p mpirun -np 2 ./build/mandelbrot_mpi $pixels $pixels -2.25 -1.5 0.75 1.5 $iterations 2>&1; } 2>&1 | grep real | awk '{print $2}' )
 
         # Append results to CSV file
         echo "$pixels,$iterations,$execution_time" >> "$out_csv"
