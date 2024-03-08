@@ -77,9 +77,9 @@ int main(int argc, char *argv[]) {
         recvcounts[size - 1] += remainder * nx;  // Adjust for remainder
     }
 
-    int *M = NULL;
+    int *matrix = NULL;
     if (rank == 0) {
-        M = (int *)malloc(ny * nx * sizeof(int));
+        matrix = (int *)malloc(ny * nx * sizeof(int));
     }
     MPI_Gatherv(rows, (end_row - start_row) * nx, MPI_INT, M, recvcounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
 
