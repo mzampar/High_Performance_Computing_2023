@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
     free(recvcounts);
     free(displs);
     if (rank == 0) {
-        free(M);
+        free(matrix);
     }
 
     MPI_Finalize();
