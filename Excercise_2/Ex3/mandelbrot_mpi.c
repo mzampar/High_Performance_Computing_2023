@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
     if (rank == 0) {
         matrix = (int *)malloc(ny * nx * sizeof(int));
     }
-    MPI_Gatherv(rows, (end_row - start_row) * nx, MPI_INT, M, recvcounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Gatherv(rows, (end_row - start_row) * nx, MPI_INT, matrix, recvcounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
 
     // Output Mandelbrot set (only root process does this)
     if (rank == 0) {
