@@ -85,9 +85,25 @@ int main(int argc, char *argv[]) {
 
     // Output Mandelbrot set (only root process does this)
     if (rank == 0) {
-        // Output or save the Mandelbrot set image
-        // For example, you can use write_pgm_image function here
-        // write_pgm_image(M, nx, ny, ...);
+    FILE* pgmimg; 
+    pgmimg = fopen("figures/mandelbrot.pgm", "wb"); 
+  
+    // Writing Magic Number to the File 
+    fprintf(pgmimg, "P2\n");  
+  
+    // Writing Width and Height 
+    fprintf(pgmimg, "%d %d\n", nx, ny);  
+  
+    // Writing the maximum gray value 
+    fprintf(pgmimg, "90\n");
+    for (int i = 0; i < ny; i++) { 
+        for (int j = 0; j < nx; j++) { 
+            fprintf(pgmimg, "%d ", matrix[i*nx + j]); 
+        } 
+        fprintf(pgmimg, "\n"); 
+    } 
+    fclose(pgmimg);
+    printf("Image written \n");
     }
 
     // Cleanup
