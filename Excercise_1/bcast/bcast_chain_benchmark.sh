@@ -22,14 +22,14 @@ src_path="/u/dssc/mzampar/.local/modules/libexec/osu-micro-benchmarks/mpi/collec
 out_csv="/u/dssc/mzampar/hpc_project/Excercise_1/bcast/results/bcast_chain.csv"
 
 # Create the CSV file with header
-echo "Algorithm,Allocation,Processes,MessageSize,Latency" > $out_csv
+echo "Algorithm,Allocation,Processes,MessageSize,MedianLatency, MinLatency, MaxLatency" > $out_csv
 
 # Iterate over map and np values
 for map in $map_values; do
   for np in $np_values; do
     # Run the mpirun command
     echo "   Benchmarking Chain with map=$map and np=$np"
-    mpirun -np $np -map-by $map --mca coll_tuned_use_dynamic_rules true --mca coll_tuned_bcast_algorithm 2 ${src_path}osu_bcast -x 1000 -i 10000 | tail -n 21 \
-    | awk -v np="$np" -v map="$map" '{printf "Chain,%s,%s,%s,%s\n",map,np,$1, $2}' | sed 's/,$//' >> $out_csv
+    mpirun -np $np -map-by $map --mca coll_tuned_use_dynamic_rules true --mca coll_tuned_bcast_algorithm 2 ${src_path}osu_bcast -x 1000 -i 10000 -f | tail -n 21 \
+    | awk -v np="$np" -v map="$map" '{printf "Chain,%s,%s,%s,%s,%s,%s\n",map,np,$1, $2,$3,$4}' | sed 's/,$//' >> $out_csv
   done
 done
