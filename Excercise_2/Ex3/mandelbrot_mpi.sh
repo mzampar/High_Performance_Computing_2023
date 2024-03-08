@@ -16,7 +16,7 @@ module load openMPI/4.1.5/icc/2021.7.1
 export OMP_NUM_THREADS=24
 
 # Compile the program
-gcc -o ./build/mandelbrot_mpi mandelbrot_mpi.c -lm -fopenmp
+mpicc -o ./build/mandelbrot_mpi mandelbrot_mpi.c -lm -fopenmp
 
 # Define pixel and iteration parameters
 pixel_values=(5000 7500 10000 15000)   # Example pixel values
