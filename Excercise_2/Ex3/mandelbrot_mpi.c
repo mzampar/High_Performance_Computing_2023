@@ -62,7 +62,8 @@ int main(int argc, char *argv[]) {
         double ci = y_L + (y_R - y_L) * j / (ny - 1);
         for (int i = 0; i < nx; i++) {
             double cr = x_L + (x_R - x_L) * i / (nx - 1);
-            rows[(j - start_row) * nx + i] = mandelbrot(cr, ci, I_max);
+            int iter = mandelbrot(cr, ci, I_max);
+            rows[(j - start_row) * nx + i] = (iter < I_max) ? iter : 0;
         }
     }
 
