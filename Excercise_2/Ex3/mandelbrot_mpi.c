@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <mpi.h>
 #include <omp.h>
 
@@ -18,18 +17,7 @@ int mandelbrot(double cr, double ci, int max_iterations) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 8) {
-        printf("Usage: %s nx ny x_L y_L x_R y_R I_max\n", argv[0]);
-        exit(1);
-    }
-
-    int provided_thread_level;
-    MPI_Init_thread(&argc, &argv, MPI_THREAD_FUNNELED, &provided_thread_level);
-    if (provided_thread_level < MPI_THREAD_FUNNELED) {
-        printf("Error: Could not initialize MPI with required threading level.\n");
-        MPI_Finalize();
-        exit(1);
-    }
+    MPI_Init(&argc, &argv);
 
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -43,46 +31,63 @@ int main(int argc, char *argv[]) {
     double y_R = atof(argv[6]);  // Upper bound of the complex plane
     int I_max = atoi(argv[7]);  // Maximum number of iterations
 
+    // Calculate number of rows for each process
     int rows_per_process = ny / size;
     int remainder = ny % size;
 
-    // Calculate start and end rows for this process
+    // Determine starting and ending row for this process
     int start_row = rank * rows_per_process;
-    int end_row = start_row + rows_per_process;
+    int end_row = (rank + 1) * rows_per_process;
     if (rank == size - 1) {
         end_row += remainder;  // Add remainder to the last process
     }
 
-    // Allocate memory for the rows to compute
-    int *rows = (int *)malloc((end_row - start_row) * nx * sizeof(int));
+    // Allocate memory for local computation
+    int *local_image = (int *)malloc(nx * (end_row - start_row) * sizeof(int));
 
-    // Compute Mandelbrot set for assigned rows using OpenMP
-    #pragma omp parallel for schedule(dynamic)
+    // Compute Mandelbrot set locally using OpenMP parallelization
+    #pragma omp parallel for collapse(2) schedule(dynamic)
     for (int j = start_row; j < end_row; j++) {
-        double ci = y_L + (y_R - y_L) * j / (ny - 1);
         for (int i = 0; i < nx; i++) {
+            // Calculate complex point corresponding to current pixel
             double cr = x_L + (x_R - x_L) * i / (nx - 1);
+            double ci = y_L + (y_R - y_L) * j / (ny - 1);
+
+            // Compute Mandelbrot iteration for the current point
             int iter = mandelbrot(cr, ci, I_max);
-            rows[(j - start_row) * nx + i] = (iter < I_max) ? iter : 0;
+
+            // Store result in local image array
+            local_image[(j - start_row) * nx + i] = iter > I_max ? I_max : 0;
         }
     }
 
-    // Gather computed rows at root process
-    int *recvcounts = (int *)malloc(size * sizeof(int));
-    int *displs = (int *)malloc(size * sizeof(int));
-    for (int i = 0; i < size; i++) {
-        recvcounts[i] = rows_per_process * nx;
-        displs[i] = i * rows_per_process * nx;
+    // Gather local images from all processes
+    int *global_image = NULL;
+    if (rank == 0) {
+        global_image = (int *)malloc(nx * ny * sizeof(int));
     }
-    if (rank == size - 1) {
-        recvcounts[size - 1] += remainder * nx;  // Adjust for remainder
+    MPI_Gather(local_image, nx * (end_row - start_row), MPI_INT,
+               global_image, nx * (end_row - start_row), MPI_INT,
+               0, MPI_COMM_WORLD);
+
+    // Process 0 reconstructs the final image matrix
+    if (rank == 0) {
+        // Output the final image matrix
+        // Here you can use the global_image array to write to a file or perform further processing
     }
 
-    int *matrix = NULL;
+    // Free allocated memory
+    free(local_image);
     if (rank == 0) {
-        matrix = (int *)malloc(ny * nx * sizeof(int));
+        free(global_image);
     }
-    MPI_Gatherv(rows, (end_row - start_row) * nx, MPI_INT, matrix, recvcounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
+
+    MPI_Finalize();
+
+    return 0;
+}
+
+    /////////////////////////////////////////
 
     // Output Mandelbrot set (only root process does this)
     if (rank == 0) {
