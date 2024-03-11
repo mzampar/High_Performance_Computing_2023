@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_size(MPI_COMM_WORLD, &size); // num of processes
 
     if (argc != 8) {
         if (rank == 0) {
@@ -53,18 +53,38 @@ int main(int argc, char *argv[]) {
 
     // Calculate number of rows each process will handle
     int my_rows = (rank < remainder) ? rows_per_process + 1 : rows_per_process;
-    int my_offset = rank * rows_per_process + (rank < remainder ? rank : remainder);
+    my_rows += (rank < remainder ? 1 : 0);
+
+printf("my_rows: %d of rank %d \n ", my_rows, rank);
+
+// Allocate memory for storing the number of rows for each process
+int *rows_per_process_array = NULL;
+if (rank == 0) {
+    rows_per_process_array = malloc(size * sizeof(int));
+}
+
+// Gather the number of rows for each process to rank 0
+MPI_Gather(&my_rows, 1, MPI_INT, rows_per_process_array, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+// Output the number of rows for each process (only on rank 0)
+if (rank == 0) {
+    printf("Number of Rows for Each Process:\n");
+    for (int i = 0; i < size; i++) {
+        printf("Process %d: %d rows\n", i, rows_per_process_array[i]);
+    }
+    printf("\n");
+}
 
     // Allocate memory for local matrix
     short int *local_matrix = (short int *) malloc(my_rows * nx * sizeof(short int));
 
     // Compute Mandelbrot set for local rows with OpenMP parallelization
     #pragma omp parallel for schedule(dynamic) shared(local_matrix)
-    for (int j = rank; j < ny; j += 1) { // Distribute rows among processes
+    for (int j = rank; j < ny; j++) { // Distribute rows among processes
         for (int i = 0; i < nx; i++) {
             // Calculate complex point corresponding to current pixel
             double cr = x_L + (x_R - x_L) * i / (nx - 1);
-            double ci = y_L + (y_R - y_L) * j * size / (ny - 1); // i want the j-th column to jump of size size
+            double ci = y_L + (y_R - y_L) * j * size / (ny - 1); // i want the j-th raw to jump of size size
 
             // Compute Mandelbrot iteration for the current point
             int iter = mandelbrot(cr, ci, I_max);
@@ -80,8 +100,8 @@ if (rank == 0) {
     recv_counts = malloc(size * sizeof(int));
     displs = malloc(size * sizeof(int));
     for (int i = 0; i < size; i++) {
-        recv_counts[i] = my_rows * nx; // Number of elements to receive from each process
-        displs[i] = i * my_rows * nx;  // Displacement for each process in the receive buffer
+        recv_counts[i] = rows_per_process_array[i] * nx; // Number of elements to receive from each process
+        displs[i] = i * rows_per_process_array[i] * nx;  // Displacement for each process in the receive buffer
     }
 }
 
@@ -97,32 +117,30 @@ MPI_Gatherv(local_matrix, my_rows * nx, MPI_SHORT, gathered_matrix, recv_counts,
 
 // Reorder gathered matrix on rank 0
 if (rank == 0) {
+
+
     // Allocate memory for the reordered matrix
     short int *reordered_matrix = (short int *)malloc(ny * nx * sizeof(short int));
 
     // Iterate over each block (from rank 1 to rank size - 1)
     for (int i = 0; i < size; i++) {
         // Compute the starting index of the block in the gathered matrix
-        int block_start_index = i * my_rows * nx;
+        int block_start_index = i * rows_per_process_array[i] * nx; // this is my_rows of master! not of the others
 
         // Compute the starting index of the block in the reordered matrix
-        int reorder_start_index = i * nx;
+        int reorder_start_index = i * nx; // i don't know the order in which the gathereed matrix is written!
 
         // Copy each row of the block to the corresponding position in the reordered matrix
-        for (int j = 0; j < my_rows; j++) {
-            memcpy(&reordered_matrix[reorder_start_index + j * nx], &gathered_matrix[block_start_index + j * nx], nx * sizeof(short int));
+        for (int j = 0; j < rows_per_process_array[i]; j++) {
+            memcpy(&reordered_matrix[reorder_start_index + j * size * nx], &gathered_matrix[block_start_index + j * nx], nx * sizeof(short int));
         }
     }
 
-    // Replace gathered_matrix with reordered_matrix
-    free(gathered_matrix);
-    gathered_matrix = reordered_matrix;
-}
 
 
-    ///////////////////////////////////
-    // Output image by rank 0
-    if (rank == 0) {
+//////////////////
+
+
         FILE *pgmimg;
         pgmimg = fopen("figures/mandelbrot.pgm", "wb");
 
@@ -136,17 +154,17 @@ if (rank == 0) {
         fprintf(pgmimg, "90\n");
         for (int i = 0; i < ny; i++) {
             for (int j = 0; j < nx; j++) {
-                fprintf(pgmimg, "%d ", gathered_matrix[i * nx + j]);
+                fprintf(pgmimg, "%d ", reordered_matrix[i * nx + j]);
             }
             fprintf(pgmimg, "\n");
         }
         fclose(pgmimg);
         printf("Image written\n");
-    }
+    
 
     // Free allocated memory
     // Free allocated memory
-    if (rank == 0) {
+
         free(gathered_matrix);
         free(recv_counts);
         free(displs);
