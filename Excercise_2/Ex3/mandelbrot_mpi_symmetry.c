@@ -4,6 +4,9 @@
 #include <mpi.h>
 #include<omp.h>
 #include<string.h>
+#include <float.h>
+#include <stdbool.h>
+
 
 // Function to update the complex values zr and zi using the Mandelbrot equation
 void f_c(double *zr, double *zi, double cr, double ci) {
@@ -24,7 +27,7 @@ int mandelbrot(double cr, double ci, int max_iterations) {
     return iter;
 }
 
-// Main function to generate the Mandelbrot set image
+
 int main(int argc, char *argv[]) {
     MPI_Init(&argc, &argv);
 
@@ -48,21 +51,34 @@ int main(int argc, char *argv[]) {
     double y_R = atof(argv[6]);  // Upper bound of the complex plane
     int I_max = atoi(argv[7]);  // Maximum number of iterations
 
+bool is_symmetric = (fabs(y_L + y_R) < DBL_EPSILON);
+
+// no need to do all the computation! you only have to compute the first half
+
+
     int rows_per_process = ny / size;
     int remainder = ny % size;
 
-    // Calculate number of rows each process will handle
-   // int my_rows = (rank < remainder) ? rows_per_process + 1 : rows_per_process;
-    //my_rows += (rank < remainder ? 1 : 0);
 
+        // Calculate number of rows each process will handle
     int my_rows;
+    if (is_symmetric) {
+        ny = ny/=2;
+        y_R=0.0;
+        rows_per_process = ny / size;
+        remainder = ny % size;
+    }
+        my_rows = (rank < remainder) ? (rows_per_process + 1) : rows_per_process; 
+
+/*
 if (rank < remainder) {
     my_rows = rows_per_process + 1;
 } else {
     my_rows = rows_per_process;
 }
+*/   
 
-printf("my_rows: %d of rank %d \n ", my_rows, rank);
+
 
 // Allocate memory for storing the number of rows for each process
 int *rows_per_process_array = NULL;
@@ -88,13 +104,11 @@ if (rank == 0) {
     // Compute Mandelbrot set for local rows with OpenMP parallelization
 
     #pragma omp parallel for schedule(dynamic) shared(local_matrix) // the problem is that the points are different, not the way i write in the matrix
-    
-    
     for (int j = rank; j < ny; j+=size) { // Distribute rows among processes 
         for (int i = 0; i < nx; i++) { 
             // Calculate complex point corresponding to current pixel
             double cr = x_L + (x_R - x_L) * i / (nx - 1);
-            double ci = y_L + (y_R - y_L) * j / (ny - 1); // the probelm is that i loose the first raw because i multiply for size.
+            double ci = y_L + (y_R - y_L) * j / (ny - 1); // the problem is that i loose the first raw because i multiply for size.
 
             // Compute Mandelbrot iteration for the current point
             int iter = mandelbrot(cr, ci, I_max);
@@ -147,8 +161,34 @@ if (rank == 0) {
         }
     }
 
-
+if (is_symmetric) {
         FILE *pgmimg;
+        pgmimg = fopen("figures/mandelbrot.pgm", "wb");
+
+        // Writing Magic Number to the File
+        fprintf(pgmimg, "P2\n");
+
+        // Writing Width and Height
+        fprintf(pgmimg, "%d %d\n", nx, 2*ny);
+
+        // Writing the maximum gray value
+        fprintf(pgmimg, "90\n");
+        for (int i = 0; i < ny; i++) {
+            for (int j = 0; j < nx; j++) {
+                fprintf(pgmimg, "%d ", reordered_matrix[i * nx + j]);
+            }
+            fprintf(pgmimg, "\n");
+        }
+// Write the image in reverse order
+for (int i = ny - 1; i >= 0; i--) { // Adjust loop bounds to iterate backwards
+    for (int j = 0; j < nx; j++) {
+        fprintf(pgmimg, "%d ", reordered_matrix[i * nx + j]);
+    }
+    fprintf(pgmimg, "\n");
+}
+    }
+    else{
+                FILE *pgmimg;
         pgmimg = fopen("figures/mandelbrot.pgm", "wb");
 
         // Writing Magic Number to the File
@@ -165,19 +205,14 @@ if (rank == 0) {
             }
             fprintf(pgmimg, "\n");
         }
-        fclose(pgmimg);
-        printf("Image written\n");
-    
+    }
 
-    // Free allocated memory
-    // Free allocated memory
 
         free(gathered_matrix);
         free(recv_counts);
         free(displs);
     }
 
-    
     free(local_matrix);
 
 
