@@ -52,8 +52,15 @@ int main(int argc, char *argv[]) {
     int remainder = ny % size;
 
     // Calculate number of rows each process will handle
-    int my_rows = (rank < remainder) ? rows_per_process + 1 : rows_per_process;
-    my_rows += (rank < remainder ? 1 : 0);
+   // int my_rows = (rank < remainder) ? rows_per_process + 1 : rows_per_process;
+    //my_rows += (rank < remainder ? 1 : 0);
+
+    int my_rows;
+if (rank < remainder) {
+    my_rows = rows_per_process + 1;
+} else {
+    my_rows = rows_per_process;
+}
 
 printf("my_rows: %d of rank %d \n ", my_rows, rank);
 
@@ -79,19 +86,25 @@ if (rank == 0) {
     short int *local_matrix = (short int *) malloc(my_rows * nx * sizeof(short int));
 
     // Compute Mandelbrot set for local rows with OpenMP parallelization
-    #pragma omp parallel for schedule(dynamic) shared(local_matrix)
-    for (int j = rank; j < ny; j++) { // Distribute rows among processes
-        for (int i = 0; i < nx; i++) {
+
+    #pragma omp parallel for schedule(dynamic) shared(local_matrix) // the problem is that the points are different, not the way i write in the matrix
+    
+    
+    for (int j = rank; j < ny; j+=size) { // Distribute rows among processes 
+        for (int i = 0; i < nx; i++) { 
             // Calculate complex point corresponding to current pixel
             double cr = x_L + (x_R - x_L) * i / (nx - 1);
-            double ci = y_L + (y_R - y_L) * j * size / (ny - 1); // i want the j-th raw to jump of size size
+            double ci = y_L + (y_R - y_L) * j / (ny - 1); // the probelm is that i loose the first raw because i multiply for size.
 
             // Compute Mandelbrot iteration for the current point
             int iter = mandelbrot(cr, ci, I_max);
 
-            local_matrix[(j - rank) * nx + i] = (iter < I_max) ? iter : 0;
+            local_matrix[(j - rank)/size * nx + i] = (iter < I_max) ? iter : 0;
         }
-    }
+}
+
+
+
 
 // Calculate the displacement and receive counts for MPI_Gatherv
 int *recv_counts = NULL;
@@ -117,8 +130,6 @@ MPI_Gatherv(local_matrix, my_rows * nx, MPI_SHORT, gathered_matrix, recv_counts,
 
 // Reorder gathered matrix on rank 0
 if (rank == 0) {
-
-
     // Allocate memory for the reordered matrix
     short int *reordered_matrix = (short int *)malloc(ny * nx * sizeof(short int));
 
@@ -135,7 +146,6 @@ if (rank == 0) {
             memcpy(&reordered_matrix[reorder_start_index + j * size * nx], &gathered_matrix[block_start_index + j * nx], nx * sizeof(short int));
         }
     }
-
 
 
 //////////////////
