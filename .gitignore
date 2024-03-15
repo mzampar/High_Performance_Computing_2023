@@ -1,3 +1,4 @@
 figures/
 build/
+results/
 *.out

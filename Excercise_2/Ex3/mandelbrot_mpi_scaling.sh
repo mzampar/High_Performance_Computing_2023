@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --nodes=4 
-#SBATCH --ntasks-per-node=4
+#SBATCH --ntasks-per-node=1
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
 #SBATCH --job-name=HPC_ex02_mandelbrot
@@ -38,8 +38,7 @@ for ((threads=2; threads<=24; threads+=2)); do
 
     for ((i=1; i<=$repetitions; i++)); do
         echo "Running repetition $i with $nodes MPI threads..."
-        time=$(srun -n $((nodes * SLURM_NTASKS_PER_NODE)) ./build/mandelbrot 1000 1000 -2 -2 2 2 1000 | grep "real" | awk '{print $2}')
-        echo "$nodes,$time" >> "$out_csv"
+        srun -n nodes ./build/mandelbrot 1000 1000 -2 -2 2 2 1000
     done
 
 done

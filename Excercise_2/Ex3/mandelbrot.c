@@ -40,6 +40,9 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    double start_time, end_time;
+    start_time = MPI_Wtime();
+
     int nx = atoi(argv[1]);  // Number of pixels in x-direction
     int ny = atoi(argv[2]);  // Number of pixels in y-direction
     double x_L = atof(argv[3]);  // Left bound of the complex plane
@@ -128,6 +131,9 @@ if (rank == 0) {
 MPI_Gatherv(local_matrix, my_rows * nx, MPI_SHORT, gathered_matrix, recv_counts, displs, MPI_SHORT, 0, MPI_COMM_WORLD);
 
 
+
+end_time = MPI_Wtime();
+
 // Reorder gathered matrix on rank 0
 if (rank == 0) {
     // Allocate memory for the reordered matrix
@@ -181,6 +187,20 @@ if (rank == 0) {
     free(local_matrix);
 
 
+    int omp_threads = omp_get_max_threads();
+    if (rank == 0) {
+        double elapsed_time = end_time - start_time;
+
+        FILE *csv_file = fopen("./results/mandelbrot_omp_execution_times.csv", "wb");
+        if (csv_file != NULL) {
+            fprintf(csv_file, "%d,", size);
+            fprintf(csv_file, "%d,", omp_threads);
+            fprintf(csv_file, "%.6f,", elapsed_time);
+            fclose(csv_file);
+        } else {
+            printf("Error: Unable to write to CSV file.\n");
+        }
+    }
 
     MPI_Finalize();
 
