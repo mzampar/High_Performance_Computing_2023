@@ -191,11 +191,11 @@ if (rank == 0) {
     if (rank == 0) {
         double elapsed_time = end_time - start_time;
 
-        FILE *csv_file = fopen("./results/mandelbrot_omp_execution_times.csv", "wb");
+        FILE *csv_file = fopen("./results/mandelbrot_omp_execution_times.csv", "ab");
         if (csv_file != NULL) {
             fprintf(csv_file, "%d,", size);
             fprintf(csv_file, "%d,", omp_threads);
-            fprintf(csv_file, "%.6f,", elapsed_time);
+            fprintf(csv_file, "%.6f\n", elapsed_time);
             fclose(csv_file);
         } else {
             printf("Error: Unable to write to CSV file.\n");

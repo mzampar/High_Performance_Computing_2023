@@ -16,7 +16,7 @@ module load openMPI/4.1.5/icx/2022.2.1
 mpicx -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 
 # Output file for storing results
-out_csv="./results/mandelbrot_mpi_execution_times.csv"
+echo "Nodes,Threads,Time(s)\n" >> "$out_csv"
 
 # Number of repetitions
 repetitions=10
@@ -26,8 +26,7 @@ export OMP_NUM_THREADS=1
 
 # MPI scaling
 echo "MPI scaling:"
-
-echo "Nodes,Time (s)" >> "$out_csv"
+echo "Nodes,Threads,Time(s)\n" >> "$out_csv"
 
 for nodes in 2 3 4; do
 
