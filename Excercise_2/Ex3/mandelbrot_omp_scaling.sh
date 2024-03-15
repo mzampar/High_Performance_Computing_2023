@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=24
+#SBATCH --ntasks-per-node=1
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
 #SBATCH --job-name=HPC_ex02_mandelbrot
@@ -25,13 +25,13 @@ repetitions=10
 echo "OMP scaling:"
 echo "Threads,Time (s), sd" >> "$out_csv"
 
-for threads in {1..8}; do
+for threads in {1..12}; do
     total_time=0
     times=()
 
     for ((i=1; i<=$repetitions; i++)); do
         echo "Running repetition $i with $threads OMP threads..."
-        export OMP_NUM_THREADS=$threads
+        export OMP_NUM_THREADS=2*$threads
         time=$(srun ./build/mandelbrot 1000 1000 -2 -2 2 2 1000 | grep "real" | awk '{print $2}')
         times+=("$time")
         total_time=$(echo "$total_time + $time" | bc -l) # Use bc -l for floating-point arithmetic
