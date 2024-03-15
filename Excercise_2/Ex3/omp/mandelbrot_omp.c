@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
 
 
     FILE* pgmimg; 
-    pgmimg = fopen("figures/mandelbrot.pgm", "wb"); 
+    pgmimg = fopen("figures/mandelbrot_omp.pgm", "wb"); 
   
     // Writing Magic Number to the File 
     fprintf(pgmimg, "P2\n");  

@@ -51,16 +51,17 @@ int main(int argc, char *argv[]) {
     double y_R = atof(argv[6]);  // Upper bound of the complex plane
     int I_max = atoi(argv[7]);  // Maximum number of iterations
 
-bool is_symmetric = (fabs(y_L + y_R) < DBL_EPSILON);
+    bool is_symmetric = (fabs(y_L + y_R) < DBL_EPSILON);
 
-// no need to do all the computation! you only have to compute the first half
+    // no need to do all the computation! you only have to compute the first half
+    // we could even do better! if y_L*y_R < 0 there is a portion we have to compute, the other symmetric part not
 
 
     int rows_per_process = ny / size;
     int remainder = ny % size;
 
 
-        // Calculate number of rows each process will handle
+    // Calculate number of rows each process will handle
     int my_rows;
     if (is_symmetric) {
         ny = ny/=2;
@@ -68,35 +69,26 @@ bool is_symmetric = (fabs(y_L + y_R) < DBL_EPSILON);
         rows_per_process = ny / size;
         remainder = ny % size;
     }
-        my_rows = (rank < remainder) ? (rows_per_process + 1) : rows_per_process; 
 
-/*
-if (rank < remainder) {
-    my_rows = rows_per_process + 1;
-} else {
-    my_rows = rows_per_process;
-}
-*/   
+    my_rows = (rank < remainder) ? (rows_per_process + 1) : rows_per_process; 
 
-
-
-// Allocate memory for storing the number of rows for each process
-int *rows_per_process_array = NULL;
-if (rank == 0) {
-    rows_per_process_array = malloc(size * sizeof(int));
-}
-
-// Gather the number of rows for each process to rank 0
-MPI_Gather(&my_rows, 1, MPI_INT, rows_per_process_array, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
-// Output the number of rows for each process (only on rank 0)
-if (rank == 0) {
-    printf("Number of Rows for Each Process:\n");
-    for (int i = 0; i < size; i++) {
-        printf("Process %d: %d rows\n", i, rows_per_process_array[i]);
+    // Allocate memory for storing the number of rows for each process
+    int *rows_per_process_array = NULL;
+    if (rank == 0) {
+        rows_per_process_array = malloc(size * sizeof(int));
     }
-    printf("\n");
-}
+
+    // Gather the number of rows for each process to rank 0
+    MPI_Gather(&my_rows, 1, MPI_INT, rows_per_process_array, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+    // Output the number of rows for each process (only on rank 0)
+    if (rank == 0) {
+        printf("Number of Rows for Each Process:\n");
+        for (int i = 0; i < size; i++) {
+            printf("Process %d: %d rows\n", i, rows_per_process_array[i]);
+        }
+        printf("\n");
+    }
 
     // Allocate memory for local matrix
     short int *local_matrix = (short int *) malloc(my_rows * nx * sizeof(short int));
@@ -115,81 +107,80 @@ if (rank == 0) {
 
             local_matrix[(j - rank)/size * nx + i] = (iter < I_max) ? iter : 0;
         }
-}
-
-
-
-
-// Calculate the displacement and receive counts for MPI_Gatherv
-int *recv_counts = NULL;
-int *displs = NULL;
-if (rank == 0) {
-    recv_counts = malloc(size * sizeof(int));
-    displs = malloc(size * sizeof(int));
-    for (int i = 0; i < size; i++) {
-        recv_counts[i] = rows_per_process_array[i] * nx; // Number of elements to receive from each process
-        displs[i] = i * rows_per_process_array[i] * nx;  // Displacement for each process in the receive buffer
     }
-}
-
-// Allocate memory for receiving the gathered matrix on rank 0
-short int *gathered_matrix = NULL;
-if (rank == 0) {
-    gathered_matrix = (short int *)malloc(ny * nx * sizeof(short int));
-}
-
-// Gather results to rank 0
-MPI_Gatherv(local_matrix, my_rows * nx, MPI_SHORT, gathered_matrix, recv_counts, displs, MPI_SHORT, 0, MPI_COMM_WORLD);
 
 
-// Reorder gathered matrix on rank 0
-if (rank == 0) {
-    // Allocate memory for the reordered matrix
-    short int *reordered_matrix = (short int *)malloc(ny * nx * sizeof(short int));
 
-    // Iterate over each block (from rank 1 to rank size - 1)
-    for (int i = 0; i < size; i++) {
-        // Compute the starting index of the block in the gathered matrix
-        int block_start_index = i * rows_per_process_array[i] * nx; // this is my_rows of master! not of the others
 
-        // Compute the starting index of the block in the reordered matrix
-        int reorder_start_index = i * nx; // i don't know the order in which the gathereed matrix is written!
-
-        // Copy each row of the block to the corresponding position in the reordered matrix
-        for (int j = 0; j < rows_per_process_array[i]; j++) {
-            memcpy(&reordered_matrix[reorder_start_index + j * size * nx], &gathered_matrix[block_start_index + j * nx], nx * sizeof(short int));
+    // Calculate the displacement and receive counts for MPI_Gatherv
+    int *recv_counts = NULL;
+    int *displs = NULL;
+    if (rank == 0) {
+        recv_counts = malloc(size * sizeof(int));
+        displs = malloc(size * sizeof(int));
+        for (int i = 0; i < size; i++) {
+            recv_counts[i] = rows_per_process_array[i] * nx; // Number of elements to receive from each process
+            displs[i] = i * rows_per_process_array[i] * nx;  // Displacement for each process in the receive buffer
         }
     }
 
-if (is_symmetric) {
-        FILE *pgmimg;
-        pgmimg = fopen("figures/mandelbrot.pgm", "wb");
+    // Allocate memory for receiving the gathered matrix on rank 0
+    short int *gathered_matrix = NULL;
+    if (rank == 0) {
+        gathered_matrix = (short int *)malloc(ny * nx * sizeof(short int));
+    }
 
-        // Writing Magic Number to the File
-        fprintf(pgmimg, "P2\n");
+    // Gather results to rank 0
+    MPI_Gatherv(local_matrix, my_rows * nx, MPI_SHORT, gathered_matrix, recv_counts, displs, MPI_SHORT, 0, MPI_COMM_WORLD);
 
-        // Writing Width and Height
-        fprintf(pgmimg, "%d %d\n", nx, 2*ny);
 
-        // Writing the maximum gray value
-        fprintf(pgmimg, "90\n");
-        for (int i = 0; i < ny; i++) {
-            for (int j = 0; j < nx; j++) {
-                fprintf(pgmimg, "%d ", reordered_matrix[i * nx + j]);
+    // Reorder gathered matrix on rank 0
+    if (rank == 0) {
+        // Allocate memory for the reordered matrix
+        short int *reordered_matrix = (short int *)malloc(ny * nx * sizeof(short int));
+
+        // Iterate over each block (from rank 1 to rank size - 1)
+        for (int i = 0; i < size; i++) {
+            // Compute the starting index of the block in the gathered matrix
+            int block_start_index = i * rows_per_process_array[i] * nx; // this is my_rows of master! not of the others
+
+            // Compute the starting index of the block in the reordered matrix
+            int reorder_start_index = i * nx; // i don't know the order in which the gathereed matrix is written!
+
+            // Copy each row of the block to the corresponding position in the reordered matrix
+            for (int j = 0; j < rows_per_process_array[i]; j++) {
+                memcpy(&reordered_matrix[reorder_start_index + j * size * nx], &gathered_matrix[block_start_index + j * nx], nx * sizeof(short int));
             }
-            fprintf(pgmimg, "\n");
         }
-// Write the image in reverse order
-for (int i = ny - 1; i >= 0; i--) { // Adjust loop bounds to iterate backwards
-    for (int j = 0; j < nx; j++) {
-        fprintf(pgmimg, "%d ", reordered_matrix[i * nx + j]);
-    }
-    fprintf(pgmimg, "\n");
-}
-    }
-    else{
-                FILE *pgmimg;
-        pgmimg = fopen("figures/mandelbrot.pgm", "wb");
+
+    if (is_symmetric) {
+            FILE *pgmimg;
+            pgmimg = fopen("figures/mandelbrot.pgm", "wb");
+
+            // Writing Magic Number to the File
+            fprintf(pgmimg, "P2\n");
+
+            // Writing Width and Height
+            fprintf(pgmimg, "%d %d\n", nx, 2*ny);
+
+            // Writing the maximum gray value
+            fprintf(pgmimg, "90\n");
+            for (int i = 0; i < ny; i++) {
+                for (int j = 0; j < nx; j++) {
+                    fprintf(pgmimg, "%d ", reordered_matrix[i * nx + j]);
+                }
+                fprintf(pgmimg, "\n");
+            }
+            // Write the image in reverse order
+            for (int i = ny - 2; i >= 0; i--) { 
+                for (int j = 0; j < nx; j++) {
+                    fprintf(pgmimg, "%d ", reordered_matrix[i * nx + j]);
+                }
+                fprintf(pgmimg, "\n");
+            }
+    }else{
+        FILE *pgmimg;
+        pgmimg = fopen("figures/mandelbrot_mpi.pgm", "wb");
 
         // Writing Magic Number to the File
         fprintf(pgmimg, "P2\n");
@@ -208,9 +199,9 @@ for (int i = ny - 1; i >= 0; i--) { // Adjust loop bounds to iterate backwards
     }
 
 
-        free(gathered_matrix);
-        free(recv_counts);
-        free(displs);
+    free(gathered_matrix);
+    free(recv_counts);
+    free(displs);
     }
 
     free(local_matrix);
