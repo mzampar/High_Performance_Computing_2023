@@ -33,7 +33,7 @@ for ((threads=2; threads<=24; threads+=2)); do
         echo "Running repetition $i with $threads OMP threads..."
         export OMP_NUM_THREADS=$threads
         time=$(srun ./build/mandelbrot 1000 1000 -2 -2 2 2 1000 | grep "real" | awk '{print $2}')
-        echo "$threads,$average_time" >> "$out_csv"
+        echo "$threads,$time" >> "$out_csv"
     done
 
 done
