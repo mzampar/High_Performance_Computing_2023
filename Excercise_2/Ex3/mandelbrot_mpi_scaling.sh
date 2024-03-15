@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --nodes=4 
-#SBATCH --ntasks-per-node=24
+#SBATCH --ntasks-per-node=4
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
 #SBATCH --job-name=HPC_ex02_mandelbrot
@@ -19,39 +19,29 @@ mpicx -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 out_csv="./results/mandelbrot_mpi_execution_times.csv"
 
 # Number of repetitions
-repetitions=1
+repetitions=10
 
 # Set environment variables
-export OMP_NUM_THREADS=24
+export OMP_NUM_THREADS=1
 
 # MPI scaling
 echo "MPI scaling:"
 
+echo "Nodes,Time (s)" >> "$out_csv"
+
 for nodes in 2 3 4; do
+
+
+for ((threads=2; threads<=24; threads+=2)); do
     total_time=0
     times=()
 
     for ((i=1; i<=$repetitions; i++)); do
-        echo "Running repetition $i with $nodes nodes..."
+        echo "Running repetition $i with $nodes MPI threads..."
         time=$(srun -n $((nodes * SLURM_NTASKS_PER_NODE)) ./build/mandelbrot 1000 1000 -2 -2 2 2 1000 | grep "real" | awk '{print $2}')
-        times+=("$time")
-        total_time=$(echo "$total_time + $time" | bc)
+        echo "$nodes,$time" >> "$out_csv"
     done
 
-    # Calculate average time
-    average_time=$(echo "scale=3; $total_time / $repetitions" | bc)
-
-    # Calculate standard deviation
-    sum_of_squares=0
-    for t in "${times[@]}"; do
-        deviation=$(echo "$t - $average_time" | bc)
-        sum_of_squares=$(echo "$sum_of_squares + $deviation * $deviation" | bc)
-    done
-    variance=$(echo "scale=3; $sum_of_squares / $repetitions" | bc)
-    sd=$(echo "scale=3; sqrt($variance)" | bc)
-
-    # Write results to CSV
-    echo "$nodes nodes,$average_time,$sd" >> "$out_csv"
 done
 
 echo "Execution completed. Results saved to $out_csv"
