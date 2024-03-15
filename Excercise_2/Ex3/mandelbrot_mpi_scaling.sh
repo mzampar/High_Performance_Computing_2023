@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --nodes=4 
-#SBATCH --ntasks-per-node=6    
+#SBATCH --ntasks-per-node=12  
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
 #SBATCH --job-name=HPC_ex02_mandelbrot
