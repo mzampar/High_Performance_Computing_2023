@@ -33,24 +33,9 @@ for ((threads=2; threads<=24; threads+=2)); do
         echo "Running repetition $i with $threads OMP threads..."
         export OMP_NUM_THREADS=$threads
         time=$(srun ./build/mandelbrot 1000 1000 -2 -2 2 2 1000 | grep "real" | awk '{print $2}')
-        times+=("$time")
-        total_time=$(echo "$total_time + $time" | bc -l) # Use bc -l for floating-point arithmetic
+        echo "$threads,$average_time" >> "$out_csv"
     done
 
-    # Calculate average time
-    average_time=$(echo "scale=3; $total_time / $repetitions" | bc -l)
-
-    # Calculate standard deviation
-    sum_of_squares=0
-    for t in "${times[@]}"; do
-        deviation=$(echo "$t - $average_time" | bc -l)
-        sum_of_squares=$(echo "$sum_of_squares + ($deviation)^2" | bc -l) # Square the deviation
-    done
-    variance=$(echo "scale=3; $sum_of_squares / $repetitions" | bc -l)
-    sd=$(echo "scale=3; sqrt($variance)" | bc -l) # Use sqrt to calculate square root
-
-    # Write results to CSV
-    echo "$threads,$average_time,$sd" >> "$out_csv"
 done
 
 echo "Execution completed. Results saved to $out_csv"
