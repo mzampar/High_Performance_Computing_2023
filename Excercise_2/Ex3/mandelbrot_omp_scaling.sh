@@ -10,7 +10,7 @@
 #SBATCH --exclude=fat[001-002]
 
 # Load necessary modules
-module load openMPI/4.1.5/icc/2021.7.1
+module load openMPI/4.1.5/icx/2022.2.1
 
 # Compile the program
 mpicc -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
