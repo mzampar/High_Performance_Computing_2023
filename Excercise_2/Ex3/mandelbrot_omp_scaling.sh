@@ -25,7 +25,7 @@ repetitions=10
 echo "OMP scaling:"
 echo "Threads,Time (s), sd" >> "$out_csv"
 
-for threads in {1..12}; do
+for ((threads=2; threads<=24; threads+=2)); do
     total_time=0
     times=()
 
