@@ -13,7 +13,7 @@
 module load openMPI/4.1.5/icx/2022.2.1
 
 # Compile the program
-mpicc -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
+mpicx -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 
 # Output file for storing results
 out_csv="./results/mandelbrot_mpi_execution_times.csv"
@@ -23,6 +23,7 @@ repetitions=10
 
 # OMP scaling
 echo "OMP scaling:"
+echo "Threads,Time (s), sd" >> "$out_csv"
 
 for threads in {1..8}; do
     total_time=0

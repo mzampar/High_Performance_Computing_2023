@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --nodes=4 
-#SBATCH --ntasks-per-node=48
+#SBATCH --ntasks-per-node=24
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
 #SBATCH --job-name=HPC_ex02_mandelbrot
@@ -13,7 +13,7 @@
 module load openMPI/4.1.5/icx/2022.2.1
 
 # Compile the program
-mpicc -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
+mpicx -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 
 # Output file for storing results
 out_csv="./results/mandelbrot_mpi_execution_times.csv"
@@ -22,7 +22,7 @@ out_csv="./results/mandelbrot_mpi_execution_times.csv"
 repetitions=1
 
 # Set environment variables
-export OMP_NUM_THREADS=12
+export OMP_NUM_THREADS=24
 
 # MPI scaling
 echo "MPI scaling:"
