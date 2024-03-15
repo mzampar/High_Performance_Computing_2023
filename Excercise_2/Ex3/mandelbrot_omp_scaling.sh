@@ -16,7 +16,7 @@ module load openMPI/4.1.5/icx/2022.2.1
 mpicx -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 
 # Output file for storing results
-out_csv="./results/mandelbrot_mpi_execution_times.csv"
+out_csv="./results/mandelbrot_omp_execution_times.csv"
 
 # Number of repetitions
 repetitions=10
