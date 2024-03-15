@@ -19,7 +19,7 @@ mpicc -o ./build/mandelbrot_mpi mandelbrot_mpi.c -lm -fopenmp
 out_csv="./results/mandelbrot_mpi_execution_times.csv"
 
 # Number of repetitions
-repetitions=100
+repetitions=1
 
 # OMP scaling
 echo "OMP scaling:"
