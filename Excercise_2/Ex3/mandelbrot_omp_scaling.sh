@@ -23,16 +23,16 @@ repetitions=10
 
 # OMP scaling
 echo "OMP scaling:"
-echo "Nodes,Threads,Time(s)\n" >> "$out_csv"
+echo "Nodes,Threads,Time(s)" > "$out_csv"  # Clear and set header
 
 for ((threads=2; threads<=24; threads+=2)); do
     total_time=0
-    times=()
 
     for ((i=1; i<=$repetitions; i++)); do
         echo "Running repetition $i with $threads OMP threads..."
         export OMP_NUM_THREADS=$threads
-        srun ./build/mandelbrot 1000 1000 -2 -2 2 2 1000 
+        elapsed_time=$(srun --exclusive ./build/mandelbrot 1000 1000 -2 -2 2 2 1000 | grep "Elapsed time:" | awk '{print $3}')
+        echo "1,$threads,$elapsed_time" >> "$out_csv"
     done
 
 done
