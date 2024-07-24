@@ -31,6 +31,11 @@ for ((i=1; i<=$repetitions; i++)); do
         echo "Running repetition $i with $threads OMP threads..."
         export OMP_NUM_THREADS=$threads
         elapsed_time=$(srun --exclusive ./build/mandelbrot 1000 1000 -2 -2 2 2 1000 | grep "Elapsed time:" | awk '{print $3}')
+
+        if [ -z "$elapsed_time" ]; then
+            continue
+        fi
+
         echo "$i,$threads,$elapsed_time" >> "$out_csv"
     done
 
