@@ -13,7 +13,7 @@
 module load openMPI/4.1.5/gnu/12.2.1
 
 # Compile the program
-mpicx -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
+mpicc -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 
 # Output file for storing results
 echo "Nodes,Threads,Time(s)\n" >> "$out_csv"
