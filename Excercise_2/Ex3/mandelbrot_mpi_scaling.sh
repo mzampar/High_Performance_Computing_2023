@@ -25,30 +25,23 @@ repetitions=10
 
 # MPI scaling
 echo "MPI scaling:"
-echo "Workers,Size,Walltime(s)" > "$out_csv"
+echo "Iteration,Total Tasks,Elapsed Time(s)" > "$out_csv"
 
-# Define the number of threads to use for OpenMP parallelism within each MPI process
-threads=1
 
-# List of number of workers
-lst=({2..70..2})
-num_workers=("1" "${lst[@]}")
+export OMP_NUM_THREADS=1
+
 
 for ((i=1; i<=$repetitions; i++)); do
-    for workers in "${num_workers[@]}"; do
-    # Set the number of MPI processes to the number of workers
-    processes=$workers
+    for total_tasks in {1..48}; do
+        echo "Running with $total_tasks MPI tasks."
 
-    echo "Running repetition $i with $processes MPI processes..."
+        elapsed_time=$(mpirun -np $total_tasks --map-by core ./build/mandelbrot  1000 1000 -2 -2 2 2 1000 $OMP_NUM_THREADS | grep "Elapsed time:" | awk '{print $3}')
+        
+        if [ -z "$elapsed_time" ]; then
+            continue
+        fi
 
-    processes=$workers
-    elapsed_time=$(mpirun -np ${processes} --map-by core ./build/mandelbrot ${threads} 1000 1000 -2 -2 2 2 1000 | grep "Elapsed time:" | awk '{print $3}')
-    
-    if [ -z "$elapsed_time" ]; then
-        continue
-    fi
-
-    echo "$i,$threads,$elapsed_time" >> "$out_csv"
+        echo "$i,$threads,$elapsed_time" >> "$out_csv"
     done
 done
 
