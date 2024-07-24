@@ -37,7 +37,7 @@ for ((i=1; i<=$repetitions; i++)); do
         if [ -z "$elapsed_time" ]; then
             continue
         fi
-        echo "$i"
+
         echo "$i,$threads,$elapsed_time" >> "$output_file"
     done
 done

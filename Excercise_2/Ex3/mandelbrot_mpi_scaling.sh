@@ -39,7 +39,6 @@ for ((i=1; i<=$repetitions; i++)); do
         
         # If elapsed_time is empty, skip this iteration
         if [ -z "$elapsed_time" ]; then
-            echo "Elapsed time not found for iteration $i with $total_tasks MPI tasks. Skipping..."
             continue
         fi
 
