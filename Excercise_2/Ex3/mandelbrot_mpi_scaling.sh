@@ -49,5 +49,7 @@ for ((i=1; i<=$repetitions; i++)); do
     fi
 
     echo "$i,$threads,$elapsed_time" >> "$out_csv"
+    done
+done
 
 echo "Execution completed. Results saved to $out_csv"
