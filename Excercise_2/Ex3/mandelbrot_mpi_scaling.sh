@@ -23,26 +23,28 @@ echo "Nodes,Threads,Time(s)\n" >> "$out_csv"
 repetitions=10
 
 
-# MPI scaling
-echo "MPI scaling:"
-echo "Iteration,Total Tasks,Elapsed Time(s)" > "$out_csv"
+echo "Iteration,Total Tasks,Elapsed Time(s)" > "$output_file"  # Clear and set header
 
-
+# Number of OpenMP threads
 export OMP_NUM_THREADS=1
 
+tasks_list=({2..24..2})
 
 for ((i=1; i<=$repetitions; i++)); do
-    for total_tasks in {1..48}; do
-        echo "Running with $total_tasks MPI tasks."
+    for total_tasks in "${tasks_list[@]}"; do
 
-        elapsed_time=$(mpirun -np $total_tasks --map-by core ./build/mandelbrot  1000 1000 -2 -2 2 2 1000 $OMP_NUM_THREADS | grep "Elapsed time:" | awk '{print $3}')
+        echo "Running iteration $i with $total_tasks MPI tasks."
+
+        elapsed_time=$(mpirun -np $total_tasks --map-by core ./build/mandelbrot 1000 1000 -2 -2 2 2 1000 $OMP_NUM_THREADS | grep "Elapsed time:" | awk '{print $3}')
         
+        # If elapsed_time is empty, skip this iteration
         if [ -z "$elapsed_time" ]; then
+            echo "Elapsed time not found for iteration $i with $total_tasks MPI tasks. Skipping..."
             continue
         fi
 
-        echo "$i,$threads,$elapsed_time" >> "$out_csv"
+        echo "$i,$total_tasks,$elapsed_time" >> "$output_file"
     done
 done
 
-echo "Execution completed. Results saved to $out_csv"
+echo "Execution completed. Results saved to $output_file"
