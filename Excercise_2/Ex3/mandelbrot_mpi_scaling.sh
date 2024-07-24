@@ -31,7 +31,7 @@ echo "Workers,Size,Walltime(s)" > "$out_csv"
 threads=1
 
 # List of number of workers
-lst=({2..256..2})
+lst=({2..70..2})
 num_workers=("1" "${lst[@]}")
 
 for ((i=1; i<=$repetitions; i++)); do
