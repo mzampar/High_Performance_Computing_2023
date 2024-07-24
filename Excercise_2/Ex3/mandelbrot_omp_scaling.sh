@@ -35,10 +35,9 @@ for ((i=1; i<=$repetitions; i++)); do
 
         # If elapsed_time is empty, skip this iteration
         if [ -z "$elapsed_time" ]; then
-            echo "Elapsed time not found for repetition $i with $threads threads. Skipping..."
             continue
         fi
-
+        echo "$i"
         echo "$i,$threads,$elapsed_time" >> "$output_file"
     done
 done
