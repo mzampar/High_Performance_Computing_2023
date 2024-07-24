@@ -10,10 +10,10 @@
 #SBATCH --exclude=fat[001-002]
 
 # Load necessary modules
-module load openMPI/4.1.5/icx/2022.2.1
+module load openMPI/4.1.5/gnu/12.2.1
 
 # Compile the program
-mpicx -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
+mpicc -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 
 # Output file for storing results
 out_csv="./results/mandelbrot_omp_execution_times.csv"
