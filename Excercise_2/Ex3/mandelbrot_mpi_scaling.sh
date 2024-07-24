@@ -16,6 +16,7 @@ module load openMPI/4.1.5/gnu/12.2.1
 mpicc -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 
 # Output file for storing results
+out_csv="./results/mandelbrot_mpi_execution_times.csv"
 echo "Nodes,Threads,Time(s)\n" >> "$out_csv"
 
 # Number of repetitions
