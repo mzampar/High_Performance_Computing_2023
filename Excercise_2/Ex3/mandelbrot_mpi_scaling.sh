@@ -24,7 +24,7 @@ repetitions=10
 
 # MPI scaling
 echo "MPI scaling:"
-echo "Workers,Size,Walltime(s)" >> ${output_file}
+echo "Workers,Size,Walltime(s)" > "$out_csv"
 
 # Define the number of threads to use for OpenMP parallelism within each MPI process
 threads=1
