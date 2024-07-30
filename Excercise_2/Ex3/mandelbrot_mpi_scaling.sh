@@ -18,7 +18,6 @@ mpicc -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 
 # Output file for storing results
 out_csv="./results/mandelbrot_mpi_execution_times.csv"
-echo "Nodes,Threads,Time(s)\n" >> "$out_csv"
 
 # Number of repetitions
 repetitions=2
@@ -42,7 +41,9 @@ for ((i=1; i<=$repetitions; i++)); do
         if [ -z "$elapsed_time" ]; then
             continue
         fi
-        
+
+        echo "Elapsed time: $elapsed_time"
+
         echo "$i,$total_tasks,$elapsed_time"
 
         echo "$i,$total_tasks,$elapsed_time" >> "$out_csv"
