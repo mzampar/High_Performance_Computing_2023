@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
 
     end_time = MPI_Wtime();
 
-    printf("Execution time: %f\n", rank, end_time - start_time);
+    printf("Execution time: %f\n", end_time - start_time);
 
     // Reorder gathered matrix on rank 0
     if (rank == 0) {
