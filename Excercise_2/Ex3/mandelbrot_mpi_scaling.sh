@@ -42,6 +42,8 @@ for ((i=1; i<=$repetitions; i++)); do
         if [ -z "$elapsed_time" ]; then
             continue
         fi
+        
+        echo "$i,$total_tasks,$elapsed_time"
 
         echo "$i,$total_tasks,$elapsed_time" >> "$out_csv"
     done
