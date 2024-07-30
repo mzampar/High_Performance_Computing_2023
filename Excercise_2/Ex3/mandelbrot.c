@@ -59,31 +59,32 @@ int main(int argc, char *argv[]) {
     //my_rows += (rank < remainder ? 1 : 0);
 
     int my_rows;
-if (rank < remainder) {
-    my_rows = rows_per_process + 1;
-} else {
-    my_rows = rows_per_process;
-}
 
-printf("my_rows: %d of rank %d \n ", my_rows, rank);
-
-// Allocate memory for storing the number of rows for each process
-int *rows_per_process_array = NULL;
-if (rank == 0) {
-    rows_per_process_array = malloc(size * sizeof(int));
-}
-
-// Gather the number of rows for each process to rank 0
-MPI_Gather(&my_rows, 1, MPI_INT, rows_per_process_array, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
-// Output the number of rows for each process (only on rank 0)
-if (rank == 0) {
-    printf("Number of Rows for Each Process:\n");
-    for (int i = 0; i < size; i++) {
-        printf("Process %d: %d rows\n", i, rows_per_process_array[i]);
+    if (rank < remainder) {
+        my_rows = rows_per_process + 1;
+    } else {
+        my_rows = rows_per_process;
     }
-    printf("\n");
-}
+
+    printf("my_rows: %d of rank %d \n ", my_rows, rank);
+
+    // Allocate memory for storing the number of rows for each process
+    int *rows_per_process_array = NULL;
+    if (rank == 0) {
+        rows_per_process_array = malloc(size * sizeof(int));
+    }
+
+    // Gather the number of rows for each process to rank 0
+    MPI_Gather(&my_rows, 1, MPI_INT, rows_per_process_array, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+    // Output the number of rows for each process (only on rank 0)
+    if (rank == 0) {
+        printf("Number of Rows for Each Process:\n");
+        for (int i = 0; i < size; i++) {
+            printf("Process %d: %d rows\n", i, rows_per_process_array[i]);
+        }
+        printf("\n");
+    }
 
     // Allocate memory for local matrix
     short int *local_matrix = (short int *) malloc(my_rows * nx * sizeof(short int));
@@ -109,70 +110,70 @@ if (rank == 0) {
 
 
 
-// Calculate the displacement and receive counts for MPI_Gatherv
-int *recv_counts = NULL;
-int *displs = NULL;
-if (rank == 0) {
-    recv_counts = malloc(size * sizeof(int));
-    displs = malloc(size * sizeof(int));
-    for (int i = 0; i < size; i++) {
-        recv_counts[i] = rows_per_process_array[i] * nx; // Number of elements to receive from each process
-        displs[i] = i * rows_per_process_array[i] * nx;  // Displacement for each process in the receive buffer
-    }
-}
-
-// Allocate memory for receiving the gathered matrix on rank 0
-short int *gathered_matrix = NULL;
-if (rank == 0) {
-    gathered_matrix = (short int *)malloc(ny * nx * sizeof(short int));
-}
-
-// Gather results to rank 0
-MPI_Gatherv(local_matrix, my_rows * nx, MPI_SHORT, gathered_matrix, recv_counts, displs, MPI_SHORT, 0, MPI_COMM_WORLD);
-
-
-
-end_time = MPI_Wtime();
-
-// Reorder gathered matrix on rank 0
-if (rank == 0) {
-    // Allocate memory for the reordered matrix
-    short int *reordered_matrix = (short int *)malloc(ny * nx * sizeof(short int));
-
-    // Iterate over each block (from rank 1 to rank size - 1)
-    for (int i = 0; i < size; i++) {
-        // Compute the starting index of the block in the gathered matrix
-        int block_start_index = i * rows_per_process_array[i] * nx; // this is my_rows of master! not of the others
-
-        // Compute the starting index of the block in the reordered matrix
-        int reorder_start_index = i * nx; // i don't know the order in which the gathereed matrix is written!
-
-        // Copy each row of the block to the corresponding position in the reordered matrix
-        for (int j = 0; j < rows_per_process_array[i]; j++) {
-            memcpy(&reordered_matrix[reorder_start_index + j * size * nx], &gathered_matrix[block_start_index + j * nx], nx * sizeof(short int));
+    // Calculate the displacement and receive counts for MPI_Gatherv
+    int *recv_counts = NULL;
+    int *displs = NULL;
+    if (rank == 0) {
+        recv_counts = malloc(size * sizeof(int));
+        displs = malloc(size * sizeof(int));
+        for (int i = 0; i < size; i++) {
+            recv_counts[i] = rows_per_process_array[i] * nx; // Number of elements to receive from each process
+            displs[i] = i * rows_per_process_array[i] * nx;  // Displacement for each process in the receive buffer
         }
     }
 
+    // Allocate memory for receiving the gathered matrix on rank 0
+    short int *gathered_matrix = NULL;
+    if (rank == 0) {
+        gathered_matrix = (short int *)malloc(ny * nx * sizeof(short int));
+    }
 
-        FILE *pgmimg;
-        pgmimg = fopen("figures/mandelbrot.pgm", "wb");
+    // Gather results to rank 0
+    MPI_Gatherv(local_matrix, my_rows * nx, MPI_SHORT, gathered_matrix, recv_counts, displs, MPI_SHORT, 0, MPI_COMM_WORLD);
 
-        // Writing Magic Number to the File
-        fprintf(pgmimg, "P2\n");
+    end_time = MPI_Wtime();
 
-        // Writing Width and Height
-        fprintf(pgmimg, "%d %d\n", nx, ny);
+    printf("Execution time: %f\n", rank, end_time - start_time);
 
-        // Writing the maximum gray value
-        fprintf(pgmimg, "90\n");
-        for (int i = 0; i < ny; i++) {
-            for (int j = 0; j < nx; j++) {
-                fprintf(pgmimg, "%d ", reordered_matrix[i * nx + j]);
+    // Reorder gathered matrix on rank 0
+    if (rank == 0) {
+        // Allocate memory for the reordered matrix
+        short int *reordered_matrix = (short int *)malloc(ny * nx * sizeof(short int));
+
+        // Iterate over each block (from rank 1 to rank size - 1)
+        for (int i = 0; i < size; i++) {
+            // Compute the starting index of the block in the gathered matrix
+            int block_start_index = i * rows_per_process_array[i] * nx; // this is my_rows of master! not of the others
+
+            // Compute the starting index of the block in the reordered matrix
+            int reorder_start_index = i * nx; // i don't know the order in which the gathereed matrix is written!
+
+            // Copy each row of the block to the corresponding position in the reordered matrix
+            for (int j = 0; j < rows_per_process_array[i]; j++) {
+                memcpy(&reordered_matrix[reorder_start_index + j * size * nx], &gathered_matrix[block_start_index + j * nx], nx * sizeof(short int));
             }
-            fprintf(pgmimg, "\n");
         }
-        fclose(pgmimg);
-        printf("Image written\n");
+
+
+    FILE *pgmimg;
+    pgmimg = fopen("figures/mandelbrot.pgm", "wb");
+
+    // Writing Magic Number to the File
+    fprintf(pgmimg, "P2\n");
+
+    // Writing Width and Height
+    fprintf(pgmimg, "%d %d\n", nx, ny);
+
+    // Writing the maximum gray value
+    fprintf(pgmimg, "90\n");
+    for (int i = 0; i < ny; i++) {
+        for (int j = 0; j < nx; j++) {
+            fprintf(pgmimg, "%d ", reordered_matrix[i * nx + j]);
+        }
+        fprintf(pgmimg, "\n");
+    }
+    fclose(pgmimg);
+    printf("Image written\n");
     
 
     // Free allocated memory
@@ -183,24 +184,7 @@ if (rank == 0) {
         free(displs);
     }
 
-    
     free(local_matrix);
-
-
-    int omp_threads = omp_get_max_threads();
-    if (rank == 0) {
-        double elapsed_time = end_time - start_time;
-
-        FILE *csv_file = fopen("./results/mandelbrot_omp_execution_times.csv", "ab");
-        if (csv_file != NULL) {
-            fprintf(csv_file, "%d,", size);
-            fprintf(csv_file, "%d,", omp_threads);
-            fprintf(csv_file, "%.6f\n", elapsed_time);
-            fclose(csv_file);
-        } else {
-            printf("Error: Unable to write to CSV file.\n");
-        }
-    }
 
     MPI_Finalize();
 
