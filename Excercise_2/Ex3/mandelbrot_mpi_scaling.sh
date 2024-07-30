@@ -24,27 +24,27 @@ echo "Nodes,Threads,Time(s)\n" >> "$out_csv"
 repetitions=2
 
 
-echo "Iteration,Total Tasks,Elapsed Time(s)" > "$output_file"  # Clear and set header
+echo "Iteration,Total Tasks,Elapsed Time(s)" > "$out_csv"  # Clear and set header
 
 # Number of OpenMP threads
 export OMP_NUM_THREADS=1
 
-tasks_list=({2..24..2})
+tasks_list=({2..48..2})
 
 for ((i=1; i<=$repetitions; i++)); do
     for total_tasks in "${tasks_list[@]}"; do
 
         echo "Running iteration $i with $total_tasks MPI tasks."
 
-        elapsed_time=$(mpirun -np $total_tasks --map-by core ./build/mandelbrot 1000 1000 -2 -2 2 2 1000 $OMP_NUM_THREADS | grep "Elapsed time:" | awk '{print $3}')
+        elapsed_time=$(mpirun -np $total_tasks --map-by core ./build/mandelbrot 1000 1000 -2 -2 2 2 1000 | grep "Elapsed time:" | awk '{print $3}')
         
         # If elapsed_time is empty, skip this iteration
         if [ -z "$elapsed_time" ]; then
             continue
         fi
 
-        echo "$i,$total_tasks,$elapsed_time" >> "$output_file"
+        echo "$i,$total_tasks,$elapsed_time" >> "$out_csv"
     done
 done
 
-echo "Execution completed. Results saved to $output_file"
+echo "Execution completed. Results saved to $out_csv"

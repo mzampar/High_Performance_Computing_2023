@@ -39,8 +39,8 @@ for ((i=1; i<=$repetitions; i++)); do
             continue
         fi
 
-        echo "$i,$threads,$elapsed_time" >> "$output_file"
+        echo "$i,$threads,$elapsed_time" >> "$out_csv"
     done
 done
 
-echo "Execution completed. Results saved to $output_file"
+echo "Execution completed. Results saved to $out_csv"
