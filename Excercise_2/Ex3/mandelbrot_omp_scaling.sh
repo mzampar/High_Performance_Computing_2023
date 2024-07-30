@@ -8,6 +8,7 @@
 #SBATCH --exclusive
 #SBATCH -A dssc
 #SBATCH --exclude=fat[001-002]
+#SBATCH --exclude thin006
 
 # Load necessary modules
 module load openMPI/4.1.5/gnu/12.2.1
@@ -19,7 +20,7 @@ mpicc -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 out_csv="./results/mandelbrot_omp_execution_times.csv"
 
 # Number of repetitions
-repetitions=10
+repetitions=2
 
 
 echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header

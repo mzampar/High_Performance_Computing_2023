@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --nodes=4 
+#SBATCH --nodes=2
 #SBATCH --ntasks-per-node=24
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
@@ -8,6 +8,7 @@
 #SBATCH --exclusive
 #SBATCH -A dssc
 #SBATCH --exclude=fat[001-002]
+#SBATCH --exclude thin006
 
 # Load necessary modules
 module load openMPI/4.1.5/gnu/12.2.1
@@ -20,7 +21,7 @@ out_csv="./results/mandelbrot_mpi_execution_times.csv"
 echo "Nodes,Threads,Time(s)\n" >> "$out_csv"
 
 # Number of repetitions
-repetitions=10
+repetitions=2
 
 
 echo "Iteration,Total Tasks,Elapsed Time(s)" > "$output_file"  # Clear and set header
