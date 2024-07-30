@@ -10,8 +10,9 @@
 #SBATCH --exclude=fat[001-002]
 #SBATCH --exclude thin006
 
-# Load necessary modules
+# Load modules
 module load openMPI/4.1.5/gnu/12.2.1
+
 
 # Compile the program
 mpicc -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
