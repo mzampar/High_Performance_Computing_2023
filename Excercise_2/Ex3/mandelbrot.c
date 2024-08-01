@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include<mpi.h>
-#include<omp.h>
-#include<string.h>
+#include <mpi.h>
+#include <omp.h>
+#include <string.h>
 
 // Function to update the complex values zr and zi using the Mandelbrot equation
 void f_c(double *zr, double *zi, double cr, double ci) {
@@ -25,7 +25,7 @@ int mandelbrot(double cr, double ci, int max_iterations) {
 }
 
 // Main function to generate the Mandelbrot set image
-int main(int argc, char *argv[]) {
+int main(int argc, unsigned char *argv[]) {
     MPI_Init(&argc, &argv);
 
     int rank, size;
@@ -54,24 +54,19 @@ int main(int argc, char *argv[]) {
     int rows_per_process = ny / size;
     int remainder = ny % size;
 
-    // Calculate number of rows each process will handle
-   // int my_rows = (rank < remainder) ? rows_per_process + 1 : rows_per_process;
-    //my_rows += (rank < remainder ? 1 : 0);
-
     int my_rows;
-
     if (rank < remainder) {
         my_rows = rows_per_process + 1;
     } else {
         my_rows = rows_per_process;
     }
 
-    printf("my_rows: %d of rank %d \n ", my_rows, rank);
+    printf("my_rows: %d of rank %d \n", my_rows, rank);
 
     // Allocate memory for storing the number of rows for each process
     int *rows_per_process_array = NULL;
     if (rank == 0) {
-        rows_per_process_array = malloc(size * sizeof(int));
+        rows_per_process_array = (int *) malloc(size * sizeof(int));
     }
 
     // Gather the number of rows for each process to rank 0
@@ -87,106 +82,58 @@ int main(int argc, char *argv[]) {
     }
 
     // Allocate memory for local matrix
-    char *local_matrix = (char *) malloc(my_rows * nx * sizeof(char));
+    unsigned char *local_matrix = (unsigned char *) malloc(my_rows * nx * sizeof(unsigned char));
 
     // Compute Mandelbrot set for local rows with OpenMP parallelization
-
-    #pragma omp parallel for schedule(dynamic) shared(local_matrix) // the problem is that the points are different, not the way i write in the matrix
-    
-    
-    for (int j = rank; j < ny; j+=size) { // Distribute rows among processes 
-        for (int i = 0; i < nx; i++) { 
-            // Calculate complex point corresponding to current pixel
+    #pragma omp parallel for schedule(dynamic) shared(local_matrix)
+    for (int j = 0; j < my_rows; j++) {
+        for (int i = 0; i < nx; i++) {
             double cr = x_L + (x_R - x_L) * i / (nx - 1);
-            double ci = y_L + (y_R - y_L) * j / (ny - 1); // the probelm is that i loose the first raw because i multiply for size.
+            double ci = y_L + (y_R - y_L) * (rank * rows_per_process + j) / (ny - 1);
 
-            // Compute Mandelbrot iteration for the current point
             int iter = mandelbrot(cr, ci, I_max);
-
-            local_matrix[(j - rank)/size * nx + i] = (iter < I_max) ? iter : 0;
+            local_matrix[j * nx + i] = (iter < I_max) ? iter : 0;
         }
-}
-
-
-
+    }
 
     // Calculate the displacement and receive counts for MPI_Gatherv
     int *recv_counts = NULL;
     int *displs = NULL;
     if (rank == 0) {
-        recv_counts = malloc(size * sizeof(int));
-        displs = malloc(size * sizeof(int));
+        recv_counts = (int *) malloc(size * sizeof(int));
+        displs = (int *) malloc(size * sizeof(int));
+        displs[0] = 0;
         for (int i = 0; i < size; i++) {
-            recv_counts[i] = rows_per_process_array[i] * nx; // Number of elements to receive from each process
-            displs[i] = i * rows_per_process_array[i] * nx;  // Displacement for each process in the receive buffer
+            recv_counts[i] = rows_per_process_array[i] * nx;
+            if (i > 0) {
+                displs[i] = displs[i - 1] + recv_counts[i - 1];
+            }
         }
     }
 
     // Allocate memory for receiving the gathered matrix on rank 0
-    char *gathered_matrix = NULL;
+    unsigned char *gathered_matrix = NULL;
     if (rank == 0) {
-        gathered_matrix = (char *)malloc(ny * nx * sizeof(char));
+        gathered_matrix = (unsigned char *) malloc(ny * nx * sizeof(unsigned char));
     }
 
     // Gather results to rank 0
-    MPI_Gatherv(local_matrix, my_rows * nx, MPI_SHORT, gathered_matrix, recv_counts, displs, MPI_SHORT, 0, MPI_COMM_WORLD);
+    MPI_Gatherv(local_matrix, my_rows * nx, MPI_UNSIGNED_CHAR, gathered_matrix, recv_counts, displs, MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
 
     end_time = MPI_Wtime();
 
-    // Reorder gathered matrix on rank 0
-    if (rank == 0) {
-
+    if (world_rank == 0) {
         printf("Elapsed time: %f\n", end_time - start_time);
-        // Allocate memory for the reordered matrix
-        char *reordered_matrix = (char *)malloc(ny * nx * sizeof(char));
-
-        // Iterate over each block (from rank 1 to rank size - 1)
-        for (int i = 0; i < size; i++) {
-            // Compute the starting index of the block in the gathered matrix
-            int block_start_index = i * rows_per_process_array[i] * nx; // this is my_rows of master! not of the others
-
-            // Compute the starting index of the block in the reordered matrix
-            int reorder_start_index = i * nx; // i don't know the order in which the gathereed matrix is written!
-
-            // Copy each row of the block to the corresponding position in the reordered matrix
-            for (int j = 0; j < rows_per_process_array[i]; j++) {
-                memcpy(&reordered_matrix[reorder_start_index + j * size * nx], &gathered_matrix[block_start_index + j * nx], nx * sizeof(char));
-            }
-        }
-
-
-    FILE *pgmimg;
-    pgmimg = fopen("figures/mandelbrot.pgm", "wb");
-
-    // Writing Magic Number to the File
-    fprintf(pgmimg, "P2\n");
-
-    // Writing Width and Height
-    fprintf(pgmimg, "%d %d\n", nx, ny);
-
-    // Writing the maximum grey value
-    fprintf(pgmimg, "90\n");
-    for (int i = 0; i < ny; i++) {
-        for (int j = 0; j < nx; j++) {
-            fprintf(pgmimg, "%d ", reordered_matrix[i * nx + j]);
-        }
-        fprintf(pgmimg, "\n");
-    }
-    fclose(pgmimg);
-    printf("Image written\n");
-    
-
-    // Free allocated memory
-    // Free allocated memory
-
+        FILE *file = fopen("figures/mandelbrot.pgm", "wb");
+        fprintf(file, "P5\n%d %d\n255\n", nx, ny);
+        fwrite(gathered_matrix, sizeof(unsigned char), nx * ny, file);
+        fclose(file);
         free(gathered_matrix);
         free(recv_counts);
         free(displs);
+        printf("Image written\n");
     }
-
-    free(local_matrix);
-
-    MPI_Finalize();
-
+    
+    MPI_Finalize(); // Finalize the MPI environment
     return 0;
 }
