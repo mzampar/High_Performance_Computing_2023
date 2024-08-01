@@ -122,7 +122,7 @@ int main(int argc, unsigned char *argv[]) {
 
     end_time = MPI_Wtime();
 
-    if (world_rank == 0) {
+    if (rank == 0) {
         printf("Elapsed time: %f\n", end_time - start_time);
         FILE *file = fopen("figures/mandelbrot.pgm", "wb");
         fprintf(file, "P5\n%d %d\n255\n", nx, ny);
