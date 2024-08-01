@@ -25,7 +25,7 @@ int mandelbrot(double cr, double ci, int max_iterations) {
 }
 
 // Main function to generate the Mandelbrot set image
-int main(int argc, unsigned char *argv[]) {
+int main(int argc, char *argv[]) {
     MPI_Init(&argc, &argv);
 
     int rank, size;
