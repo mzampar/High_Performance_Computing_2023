@@ -33,14 +33,13 @@ export OMP_NUM_THREADS=1
 
 BASE_ROWS=800
 BASE_COLS=1000
-max_procs=48
 
-tasks_list=({2..$max_procs..2})
+tasks_list=({2..48..2})
 
 for ((i=1; i<=$repetitions; i++)); do
     for total_tasks in "${tasks_list[@]}"; do
 
-        let rows=$((BASE_ROWS*total_procs))
+        let rows=$((BASE_ROWS*total_tasks))
 
         echo "Running iteration $i with $total_tasks MPI tasks."
 
