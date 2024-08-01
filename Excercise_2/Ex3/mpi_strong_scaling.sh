@@ -17,7 +17,7 @@ module load openMPI/4.1.5/gnu/12.2.1
 mpicc -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 
 # Output file for storing results
-out_csv="./results/mandelbrot_mpi_execution_times.csv"
+out_csv="./results/mpi_strong_scaling.csv"
 
 # Number of repetitions
 repetitions=2
@@ -35,7 +35,7 @@ for ((i=1; i<=$repetitions; i++)); do
 
         echo "Running iteration $i with $total_tasks MPI tasks."
 
-        elapsed_time=$(mpirun -np $total_tasks --map-by core ./build/mandelbrot 1000 1000 -2 -2 2 2 1000 | grep "Elapsed time:" | awk '{print $3}')
+        elapsed_time=$(mpirun -np $total_tasks --map-by core ./build/mandelbrot 800 1000 -1.5 -1.25 0.5 1.25 65535 | grep "Elapsed time:" | awk '{print $3}')
         
         echo "$i,$total_tasks,$elapsed_time" >> "$out_csv"
     done

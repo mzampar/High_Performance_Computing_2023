@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
     // Writing Width and Height
     fprintf(pgmimg, "%d %d\n", nx, ny);
 
-    // Writing the maximum gray value
+    // Writing the maximum grey value
     fprintf(pgmimg, "90\n");
     for (int i = 0; i < ny; i++) {
         for (int j = 0; j < nx; j++) {
