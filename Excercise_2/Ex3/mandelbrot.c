@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Allocate memory for local matrix
-    short int *local_matrix = (short int *) malloc(my_rows * nx * sizeof(short int));
+    char *local_matrix = (char *) malloc(my_rows * nx * sizeof(char));
 
     // Compute Mandelbrot set for local rows with OpenMP parallelization
 
@@ -123,9 +123,9 @@ int main(int argc, char *argv[]) {
     }
 
     // Allocate memory for receiving the gathered matrix on rank 0
-    short int *gathered_matrix = NULL;
+    char *gathered_matrix = NULL;
     if (rank == 0) {
-        gathered_matrix = (short int *)malloc(ny * nx * sizeof(short int));
+        gathered_matrix = (char *)malloc(ny * nx * sizeof(char));
     }
 
     // Gather results to rank 0
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
 
         printf("Elapsed time: %f\n", end_time - start_time);
         // Allocate memory for the reordered matrix
-        short int *reordered_matrix = (short int *)malloc(ny * nx * sizeof(short int));
+        char *reordered_matrix = (char *)malloc(ny * nx * sizeof(char));
 
         // Iterate over each block (from rank 1 to rank size - 1)
         for (int i = 0; i < size; i++) {
@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
 
             // Copy each row of the block to the corresponding position in the reordered matrix
             for (int j = 0; j < rows_per_process_array[i]; j++) {
-                memcpy(&reordered_matrix[reorder_start_index + j * size * nx], &gathered_matrix[block_start_index + j * nx], nx * sizeof(short int));
+                memcpy(&reordered_matrix[reorder_start_index + j * size * nx], &gathered_matrix[block_start_index + j * nx], nx * sizeof(char));
             }
         }
 
