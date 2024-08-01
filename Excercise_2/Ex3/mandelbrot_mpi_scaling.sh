@@ -37,15 +37,6 @@ for ((i=1; i<=$repetitions; i++)); do
 
         elapsed_time=$(mpirun -np $total_tasks --map-by core ./build/mandelbrot 1000 1000 -2 -2 2 2 1000 | grep "Elapsed time:" | awk '{print $3}')
         
-        # If elapsed_time is empty, skip this iteration
-        if [ -z "$elapsed_time" ]; then
-            continue
-        fi
-
-        echo "Elapsed time: $elapsed_time"
-
-        echo "$i,$total_tasks,$elapsed_time"
-
         echo "$i,$total_tasks,$elapsed_time" >> "$out_csv"
     done
 done
