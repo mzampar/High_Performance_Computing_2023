@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <mpi.h>
-#include <omp.h>
-#include <string.h>
+#include<mpi.h>
+#include<omp.h>
+#include<string.h>
 
 // Function to update the complex values zr and zi using the Mandelbrot equation
 void f_c(double *zr, double *zi, double cr, double ci) {
@@ -133,10 +133,10 @@ int main(int argc, char *argv[]) {
 
     end_time = MPI_Wtime();
 
-    printf("Elapsed time: %f\n", end_time - start_time);
-
     // Reorder gathered matrix on rank 0
     if (rank == 0) {
+
+        printf("Elapsed time: %f\n", end_time - start_time);
         // Allocate memory for the reordered matrix
         short int *reordered_matrix = (short int *)malloc(ny * nx * sizeof(short int));
 
