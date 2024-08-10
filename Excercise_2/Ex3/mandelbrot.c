@@ -67,14 +67,11 @@ int main(int argc, char *argv[]) {
 
     int num_threads = omp_get_num_threads();
     printf("Number of threads: %d\n", num_threads);
-    int rows_per_process = ny / size;
+    int my_rows = ny / size;
     int remainder = ny % size;
-
-    int my_rows;
+    int my_remainder = 0;
     if (rank < remainder) {
-        my_rows = rows_per_process + 1;
-    } else {
-        my_rows = rows_per_process;
+        int my_remainder = 1;
     }
 
     printf("Rank %d num rows: %d \n", rank, my_rows);
@@ -87,7 +84,7 @@ int main(int argc, char *argv[]) {
 
     // Compute Mandelbrot set for local rows with OpenMP parallelization
     #pragma omp parallel for schedule(dynamic) if(num_threads > 1)
-    for (int j = 0; j < my_rows; j++) {
+    for (int j = 0; j < my_rows + my_remainder; j++) {
         for (int i = 0; i < nx; i++) {
             double cr = x_L + (x_R - x_L) * i / (nx - 1);
             double ci = y_L + (y_R - y_L) * (j * size + rank) / (ny - 1);
@@ -116,14 +113,19 @@ int main(int argc, char *argv[]) {
                     gathered_matrix + j * size * nx, nx, MPI_CHAR,
                     0, MPI_COMM_WORLD); 
         }
+
+        if (my_remainder == 1) {
+            memcpy(row_buffer, local_matrix + my_rows * nx, nx * sizeof(char));
+            MPI_Gather(row_buffer, nx, MPI_CHAR,
+                    gathered_matrix + my_rows * size * nx, nx, MPI_CHAR,
+                    0, MPI_COMM_WORLD);
+        }
+
         free(row_buffer);
         free(local_matrix);
     }
 
-    end_time = MPI_Wtime();
-
     if (rank == 0) {
-        printf("Elapsed time: %f\n", end_time - start_time);
         FILE *file = fopen("figures/mandelbrot.pgm", "wb");
         // set the number of different grey levels to 50
         fprintf(file, "P5\n%d %d\n50\n", nx, ny);
@@ -134,6 +136,8 @@ int main(int argc, char *argv[]) {
             fwrite(gathered_matrix, sizeof(char), nx * ny, file);
             free(gathered_matrix);
         }
+        end_time = MPI_Wtime();
+        printf("Elapsed time: %f\n", end_time - start_time);
         fclose(file);
         printf("Image written\n");
     }
