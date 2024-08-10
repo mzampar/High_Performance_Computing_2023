@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
         int my_remainder = 1;
     }
 
-    printf("Rank %d num rows: %d \n", rank, my_rows);
+    printf("Number of rows given to rank %d: %d. \n", rank, my_rows);
 
     // Allocate memory for local matrix
     char *local_matrix = (char *) malloc(my_rows * nx * sizeof(char));
@@ -82,12 +82,16 @@ int main(int argc, char *argv[]) {
     // Barrier to synchronize all processes and measure the elapsed time, to check that the workload is balanced
     MPI_Barrier(MPI_COMM_WORLD);
 
+    const double delta_x = (x_R - x_L) / (nx - 1);
+    const double delta_y = (y_R - y_L) / (ny - 1);
+    double cr, ci;
+
     // Compute Mandelbrot set for local rows with OpenMP parallelization
-    #pragma omp parallel for schedule(dynamic) if(num_threads > 1)
+    #pragma omp parallel for schedule(dynamic) collapse(2) private(cr, ci) if(num_threads > 1)
     for (int j = 0; j < my_rows + my_remainder; j++) {
         for (int i = 0; i < nx; i++) {
-            double cr = x_L + (x_R - x_L) * i / (nx - 1);
-            double ci = y_L + (y_R - y_L) * (j * size + rank) / (ny - 1);
+            cr = x_L + i * delta_x;
+            ci = y_L + (j * size + rank) * delta_y;
             local_matrix[j * nx + i] = mandelbrot(cr, ci, I_max);
         }
     }
