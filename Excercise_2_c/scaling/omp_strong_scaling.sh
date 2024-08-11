@@ -35,8 +35,8 @@ for ((i=1; i<=$repetitions; i++)); do
     for threads in "${threads_list[@]}"; do
         echo "Running repetition $i with $threads OMP threads..."
         export OMP_NUM_THREADS=$threads
-        export OMP_PLACES=sockets
-        export OMP_PROC_BIND=spread
+        export OMP_PLACES=cores
+        export OMP_PROC_BIND=close
         elapsed_time=$(mpirun -np 1 --map-by socket --bind-to socket ./build/mandelbrot 10000 10000 -1.5 -1.25 0.5 1.25 255 | grep "Elapsed time:" | awk '{print $3}')
         echo "$i,$threads,$elapsed_time" >> "$out_csv"
     done
