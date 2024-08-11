@@ -111,9 +111,9 @@ int main(int argc, char *argv[]) {
 
         for (int j = 0; j < my_rows; j++) {
             // Copy a row from local_matrix to row_buffer
-            memcpy(row_buffer, local_matrix + j * nx, nx * sizeof(char));
+            //memcpy(row_buffer, local_matrix + j * nx, nx * sizeof(char));
             // Gather the row from each process into the gathered_matrix
-            MPI_Gather(row_buffer, nx, MPI_CHAR,
+            MPI_Gather(local_matrix + j * nx, nx, MPI_CHAR,
                     gathered_matrix + j * size * nx, nx, MPI_CHAR,
                     0, MPI_COMM_WORLD); 
         }

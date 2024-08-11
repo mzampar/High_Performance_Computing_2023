@@ -17,7 +17,7 @@ module load openMPI/4.1.5/gnu/12.2.1
 mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 
 # Output file for storing results
-out_csv="./results/mpi_weak_scaling.csv"
+out_csv="./scaling/results/mpi_weak_scaling.csv"
 
 # Number of repetitions
 repetitions=2
