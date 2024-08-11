@@ -2,9 +2,9 @@
 
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=12
+#SBATCH --cpus-per-task=64
 #SBATCH --time=02:00:00
-#SBATCH --partition=THIN
+#SBATCH --partition=EPYC
 #SBATCH --job-name=omp_weak_scaling
 #SBATCH --error=omp_strong_scaling_%j.err
 #SBATCH --error=omp_strong_scaling_%j.out
@@ -34,7 +34,7 @@ BASE_COLS=5000
 
 echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
 
-threads_list=({2..24..2})
+threads_list=({16..64..8})
 
 echo "Running OpenMP weak scaling."
 
