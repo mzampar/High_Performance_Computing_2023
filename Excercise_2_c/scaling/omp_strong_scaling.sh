@@ -21,12 +21,14 @@ mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 out_csv="./scaling/results/omp_strong_scaling.csv"
 
 # Number of repetitions
-repetitions=2
+repetitions=1
 
 
 echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
 
 threads_list=({2..24..2})
+
+echo "Running OpenMP strong scaling."
 
 for ((i=1; i<=$repetitions; i++)); do
     for threads in "${threads_list[@]}"; do

@@ -36,6 +36,8 @@ BASE_COLS=1000
 
 tasks_list=({2..96..2})
 
+echo "Running MPI weak scaling."
+
 for ((i=1; i<=$repetitions; i++)); do
     for total_tasks in "${tasks_list[@]}"; do
 
