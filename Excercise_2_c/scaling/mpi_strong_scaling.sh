@@ -34,7 +34,7 @@ for ((i=1; i<=$repetitions; i++)); do
 
         echo "Running iteration $i with $total_tasks MPI tasks."
 
-        elapsed_time=$(mpirun -np $total_tasks --map-by core ./build/mandelbrot 800 1000 -1.5 -1.25 0.5 1.25 255 | grep "Elapsed time:" | awk '{print $3}')
+        elapsed_time=$(mpirun -np $total_tasks --map-by core ./build/mandelbrot 10000 10000 -1.5 -1.25 0.5 1.25 255 | grep "Elapsed time:" | awk '{print $3}')
         
         echo "$i,$total_tasks,$elapsed_time" >> "$out_csv"
     done
