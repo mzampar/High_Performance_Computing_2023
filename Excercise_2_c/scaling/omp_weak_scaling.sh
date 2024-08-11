@@ -6,6 +6,8 @@
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
 #SBATCH --job-name=omp_weak_scaling
+#SBATCH --error=omp_strong_scaling_%j.err
+#SBATCH --error=omp_strong_scaling_%j.out
 #SBATCH --exclusive
 #SBATCH -A dssc
 #SBATCH --exclude=fat[001-002]

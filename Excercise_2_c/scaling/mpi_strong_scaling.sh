@@ -6,6 +6,7 @@
 #SBATCH --partition=THIN
 #SBATCH --job-name=mpi_strong_scaling
 #SBATCH --error=mpi_strong_scaling_%j.err
+#SBATCH --error=mpi_strong_scaling_%j.out
 #SBATCH --exclusive
 #SBATCH -A dssc
 #SBATCH --exclude=fat[001-002]
