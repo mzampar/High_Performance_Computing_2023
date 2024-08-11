@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     // printf("Number of rows given to rank %d: %d. \n", rank, my_rows+my_remainder);
 
     // Allocate memory for local matrix
-    char *local_matrix = (char *) malloc(my_rows * nx * sizeof(char));
+    char *local_matrix = (char *) malloc((my_rows + my_remainder) * nx * sizeof(char));
 
     // Barrier to synchronize all processes and measure the elapsed time, to check that the workload is balanced
     // MPI_Barrier(MPI_COMM_WORLD);
