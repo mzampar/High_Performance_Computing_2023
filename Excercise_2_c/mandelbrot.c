@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
             ci = y_L + (j * size + rank) * delta_y;
             for (int i = 0; i < nx; i++) {
                 cr = x_L + i * delta_x;
-                local_buffer[i] = mandelbrot(cr, ci, I_max);
+                local_buffer[i] = (char)mandelbrot(cr, ci, I_max);
             }
             memcpy(local_matrix + j * nx, local_buffer, nx * sizeof(char));
         }
