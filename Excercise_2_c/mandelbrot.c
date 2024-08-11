@@ -71,10 +71,10 @@ int main(int argc, char *argv[]) {
     const int remainder = ny % size;
     int my_remainder = 0;
     if (rank < remainder) {
-        int my_remainder = 1;
+        my_remainder = 1;
     }
 
-    printf("Number of rows given to rank %d: %d. \n", rank, my_rows);
+    printf("Number of rows given to rank %d: %d. \n", rank, my_rows+my_remainder);
 
     // Allocate memory for local matrix
     char *local_matrix = (char *) malloc(my_rows * nx * sizeof(char));
@@ -106,26 +106,37 @@ int main(int argc, char *argv[]) {
         if (rank == 0) {
             gathered_matrix = (char *) malloc(ny * nx * sizeof(char));
         }
-        // Allocate memory for row_buffer
-        char *row_buffer = (char *) malloc(nx * sizeof(char));
-
         for (int j = 0; j < my_rows; j++) {
-            // Copy a row from local_matrix to row_buffer
-            //memcpy(row_buffer, local_matrix + j * nx, nx * sizeof(char));
             // Gather the row from each process into the gathered_matrix
             MPI_Gather(local_matrix + j * nx, nx, MPI_CHAR,
                     gathered_matrix + j * size * nx, nx, MPI_CHAR,
                     0, MPI_COMM_WORLD); 
         }
 
-        if (my_remainder == 1) {
-            memcpy(row_buffer, local_matrix + my_rows * nx, nx * sizeof(char));
-            MPI_Gather(row_buffer, nx, MPI_CHAR,
-                    gathered_matrix + my_rows * size * nx, nx, MPI_CHAR,
-                    0, MPI_COMM_WORLD);
-        }
+int my_color = (my_remainder == 1) ? 1 : MPI_UNDEFINED;
+MPI_Comm sub_comm;
 
-        free(row_buffer);
+MPI_Comm_split(MPI_COMM_WORLD, my_color, rank, &sub_comm);
+
+// Now, only processes with `my_remainder == 1` will have `sub_comm` != MPI_COMM_NULL
+if (sub_comm != MPI_COMM_NULL) {
+    int sub_rank, sub_size;
+    MPI_Comm_rank(sub_comm, &sub_rank);
+    MPI_Comm_size(sub_comm, &sub_size);
+    printf("Rank %d has a remainder and belongs to a sub-communicator with subsize %d\n", rank, sub_size);
+
+    // Gather data among processes in this sub-communicator
+    if (sub_size >1) {
+    MPI_Gather(local_matrix + my_rows * nx, nx, MPI_CHAR,
+               gathered_matrix + my_rows * size * nx, nx, MPI_CHAR,
+               0, sub_comm);
+    } else {
+        memcpy(gathered_matrix + my_rows * size * nx, local_matrix + my_rows * nx, nx);
+    }
+
+    MPI_Comm_free(&sub_comm);
+}
+
         free(local_matrix);
     }
 
@@ -133,12 +144,12 @@ int main(int argc, char *argv[]) {
         FILE *file = fopen("figures/mandelbrot.pgm", "wb");
         // set the number of different grey levels to 50
         fprintf(file, "P5\n%d %d\n50\n", nx, ny);
-        if (size == 1) {
-            fwrite(local_matrix, sizeof(char), nx * ny, file);
-            free(local_matrix);
-        } else {
+        if (size > 1) {
             fwrite(gathered_matrix, sizeof(char), nx * ny, file);
             free(gathered_matrix);
+        } else {
+            fwrite(local_matrix, sizeof(char), nx * ny, file);
+            free(local_matrix);
         }
         end_time = MPI_Wtime();
         printf("Elapsed time: %f\n", end_time - start_time);
