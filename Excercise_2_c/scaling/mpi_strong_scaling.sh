@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --nodes=2
+#SBATCH --nodes=4
 #SBATCH --ntasks-per-node=24
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
@@ -20,15 +20,14 @@ mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 out_csv="./scaling/results/mpi_strong_scaling.csv"
 
 # Number of repetitions
-repetitions=2
-
+repetitions=1
 
 echo "Iteration,Total Tasks,Elapsed Time(s)" > "$out_csv"  # Clear and set header
 
 # Number of OpenMP threads
 export OMP_NUM_THREADS=1
 
-tasks_list=({2..48..2})
+tasks_list=({2..96..2})
 
 for ((i=1; i<=$repetitions; i++)); do
     for total_tasks in "${tasks_list[@]}"; do
