@@ -2,16 +2,14 @@
 
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=12
+#SBATCH --cpus-per-task=64
 #SBATCH --time=02:00:00
-#SBATCH --partition=THIN
+#SBATCH --partition=EPYC
 #SBATCH --job-name=omp_strong_scaling
 #SBATCH --error=omp_strong_scaling_%j.err
 #SBATCH --error=omp_strong_scaling_%j.out
 #SBATCH --exclusive
 #SBATCH -A dssc
-#SBATCH --exclude=fat[001-002]
-#SBATCH --exclude thin006
 
 # Load modules
 module load openMPI/4.1.5/gnu/12.2.1
@@ -27,7 +25,7 @@ repetitions=1
 
 echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
 
-threads_list=({2..24..2})
+threads_list=({8..64..8})
 
 echo "Running OpenMP strong scaling."
 
