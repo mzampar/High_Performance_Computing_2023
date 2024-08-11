@@ -22,13 +22,13 @@ mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 out_csv="./scaling/results/omp_weak_scaling.csv"
 
 # Number of repetitions
-repetitions=1
+repetitions=2
 
 # Constant amout of work per worker: C = problem size / number of workers
 # Therefore, problem size = C * number of workers 
 
-BASE_ROWS=100
-BASE_COLS=100
+BASE_ROWS=500
+BASE_COLS=500
 
 
 echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
