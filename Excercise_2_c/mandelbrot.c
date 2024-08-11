@@ -68,6 +68,9 @@ int main(int argc, char *argv[]) {
 
     const int num_threads = omp_get_num_threads();
     printf("Number of threads: %d\n", num_threads);
+
+    omp_set_num_threads(10);
+
     const int my_rows = ny / size;
     const int remainder = ny % size;
     int my_remainder = 0;
