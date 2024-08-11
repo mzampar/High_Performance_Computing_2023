@@ -91,7 +91,6 @@ int main(int argc, char *argv[]) {
     #pragma omp parallel private(cr, ci)
     {
         char *local_buffer = (char *) malloc(nx * sizeof(char));
-
         #pragma omp for schedule(dynamic)
         for (int j = 0; j < my_rows + my_remainder; j++) {
             ci = y_L + (j * size + rank) * delta_y;
@@ -101,7 +100,6 @@ int main(int argc, char *argv[]) {
             }
             memcpy(local_matrix + j * nx, local_buffer, nx * sizeof(char));
         }
-
         free(local_buffer);
     }
     

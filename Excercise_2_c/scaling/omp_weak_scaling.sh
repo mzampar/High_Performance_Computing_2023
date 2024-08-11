@@ -24,9 +24,11 @@ out_csv="./scaling/results/omp_weak_scaling.csv"
 # Number of repetitions
 repetitions=1
 
-BASE_ROWS=800
-BASE_COLS=1000
-max_procs=48
+# Constant amout of work per worker: C = problem size / number of workers
+# Therefore, problem size = C * number of workers 
+
+BASE_ROWS=100
+BASE_COLS=100
 
 
 echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
@@ -38,13 +40,14 @@ echo "Running OpenMP weak scaling."
 for ((i=1; i<=$repetitions; i++)); do
     for threads in "${threads_list[@]}"; do
 
-        let rows=$((BASE_ROWS*threads))
+        rows=$(echo "$BASE_ROWS * sqrt($threads)" | bc -l)
+        cols=$(echo "$BASE_COLS * sqrt($threads)" | bc -l)
 
         echo "Running repetition $i with $threads OMP threads..."
         export OMP_NUM_THREADS=$threads
         export OMP_PLACES=cores
         export OMP_PROC_BIND=close
-        elapsed_time=$(mpirun -np 1 --map-by socket --bind-to socket ./build/mandelbrot $BASE_COLS $rows -1.5 -1.25 0.5 1.25 255 | grep "Elapsed time:" | awk '{print $3}')
+        elapsed_time=$(mpirun -np 1 --map-by socket --bind-to socket ./build/mandelbrot $cols $rows -1.5 -1.25 0.5 1.25 255 | grep "Elapsed time:" | awk '{print $3}')
 
         echo "$i,$threads,$elapsed_time" >> "$out_csv"
     done
