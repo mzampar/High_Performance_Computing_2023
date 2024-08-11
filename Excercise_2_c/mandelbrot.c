@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
                         0, sub_comm);
             } else {
                 printf("Rank %d in sub_comm %d\n", rank, sub_rank);
-                memcpy(gathered_matrix + my_rows * size * nx, local_matrix + my_rows * nx, nx);
+                memcpy(gathered_matrix + my_rows * size * nx, local_matrix + my_rows * nx, nx * sizeof(char));
             }
 
             MPI_Comm_free(&sub_comm);
