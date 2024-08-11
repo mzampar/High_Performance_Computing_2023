@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
-#SBATCH --job-name=HPC_ex02_mandelbrot
+#SBATCH --job-name=omp_weak_scaling
 #SBATCH --exclusive
 #SBATCH -A dssc
 #SBATCH --exclude=fat[001-002]
