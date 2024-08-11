@@ -33,8 +33,8 @@ export OMP_NUM_THREADS=1
 # Constant amout of work per worker: C = problem size / number of workers
 # Therefore, problem size = C * number of workers 
 
-BASE_ROWS=1000
-BASE_COLS=1000
+BASE_ROWS=10000
+BASE_COLS=10000
 
 tasks_list=({2..96..2})
 
