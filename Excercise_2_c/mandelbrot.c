@@ -66,8 +66,8 @@ int main(int argc, char *argv[]) {
             I_max = atoi(argv[7]);  // Maximum number of iterations
     }
 
-    const int num_threads = omp_get_num_threads();
-    printf("Number of threads: %d\n", num_threads);
+    // const int num_threads = omp_get_num_threads();
+    // printf("Number of threads: %d\n", num_threads);
 
     const int my_rows = ny / size;
     const int remainder = ny % size;
@@ -76,20 +76,20 @@ int main(int argc, char *argv[]) {
         my_remainder = 1;
     }
 
-    printf("Number of rows given to rank %d: %d. \n", rank, my_rows+my_remainder);
+    // printf("Number of rows given to rank %d: %d. \n", rank, my_rows+my_remainder);
 
     // Allocate memory for local matrix
     char *local_matrix = (char *) malloc(my_rows * nx * sizeof(char));
 
     // Barrier to synchronize all processes and measure the elapsed time, to check that the workload is balanced
-    MPI_Barrier(MPI_COMM_WORLD);
+    // MPI_Barrier(MPI_COMM_WORLD);
 
     const double delta_x = (x_R - x_L) / (nx - 1);
     const double delta_y = (y_R - y_L) / (ny - 1);
     double cr, ci;
 
     // Compute Mandelbrot set for local rows with OpenMP parallelization
-    #pragma omp parallel for schedule(dynamic) collapse(2) private(cr, ci) //if(num_threads > 1) // to check if the if condition is useful
+    #pragma omp parallel for schedule(dynamic) collapse(2) private(cr, ci)
     for (int j = 0; j < my_rows + my_remainder; j++) {
         for (int i = 0; i < nx; i++) {
             cr = x_L + i * delta_x;
@@ -98,8 +98,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    end_time = MPI_Wtime();
-    printf("Elapsed time for rank %d: %f\n", rank, end_time - start_time);
+    // end_time = MPI_Wtime();
+    // printf("Elapsed time for rank %d: %f\n", rank, end_time - start_time);
 
     char *gathered_matrix = NULL;
 
