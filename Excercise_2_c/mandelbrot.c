@@ -86,17 +86,26 @@ int main(int argc, char *argv[]) {
 
     const double delta_x = (x_R - x_L) / (nx - 1);
     const double delta_y = (y_R - y_L) / (ny - 1);
-    //double cr, ci;
+    double cr, ci;
 
-    // Compute Mandelbrot set for local rows with OpenMP parallelization
-    #pragma omp parallel for schedule(dynamic) collapse(2) //private(cr, ci)
-    for (int j = 0; j < my_rows + my_remainder; j++) {
-        for (int i = 0; i < nx; i++) {
-            double cr = x_L + i * delta_x;
-            double ci = y_L + (j * size + rank) * delta_y;
-            local_matrix[j * nx + i] = mandelbrot(cr, ci, I_max);
+    #pragma omp parallel private(cr, ci)
+    {
+        char *local_buffer = (char *) malloc(nx * sizeof(char));
+
+        #pragma omp for schedule(dynamic)
+        for (int j = 0; j < my_rows + my_remainder; j++) {
+            ci = y_L + (j * size + rank) * delta_y;
+            for (int i = 0; i < nx; i++) {
+                cr = x_L + i * delta_x;
+                local_buffer[i] = mandelbrot(cr, ci, I_max);
+            }
+            memcpy(local_matrix + j * nx, local_buffer, nx * sizeof(char));
         }
+
+        free(local_buffer);
     }
+    
+
 
     // end_time = MPI_Wtime();
     // printf("Elapsed time for rank %d: %f\n", rank, end_time - start_time);
