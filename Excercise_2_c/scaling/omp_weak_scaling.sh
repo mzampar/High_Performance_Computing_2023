@@ -1,7 +1,8 @@
 #!/bin/bash
 
-#SBATCH --nodes=4
-#SBATCH --ntasks-per-node=128
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=64
 #SBATCH --time=01:00:00
 #SBATCH --partition=EPYC
 #SBATCH --job-name=omp_weak_scaling
@@ -9,6 +10,7 @@
 #SBATCH --error=omp_strong_scaling_%j.out
 #SBATCH --exclusive
 #SBATCH -A dssc
+
 
 # Load modules
 module load openMPI/4.1.5/gnu/12.2.1

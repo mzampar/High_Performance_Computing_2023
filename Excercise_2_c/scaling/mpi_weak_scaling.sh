@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --nodes=4
+#SBATCH --nodes=2
 #SBATCH --ntasks-per-node=128
 #SBATCH --time=01:00:00
 #SBATCH --partition=EPYC
@@ -34,7 +34,7 @@ export OMP_NUM_THREADS=1
 BASE_ROWS=1000
 BASE_COLS=1000
 
-tasks_list=({2..96..2})
+tasks_list=({2..256..2})
 
 echo "Running MPI weak scaling."
 
