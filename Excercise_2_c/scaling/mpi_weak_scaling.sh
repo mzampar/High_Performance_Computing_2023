@@ -1,16 +1,14 @@
 #!/bin/bash
 
 #SBATCH --nodes=4
-#SBATCH --ntasks-per-node=24
-#SBATCH --time=02:00:00
-#SBATCH --partition=THIN
+#SBATCH --ntasks-per-node=128
+#SBATCH --time=01:00:00
+#SBATCH --partition=EPYC
 #SBATCH --job-name=mpi_weak_scaling
-#SBATCH --error=mpi_strong_scaling_%j.err
-#SBATCH --error=mpi_strong_scaling_%j.out
+#SBATCH --error=mpi_weak_scaling_%j.err
+#SBATCH --error=mpi_weak_scaling_%j.out
 #SBATCH --exclusive
 #SBATCH -A dssc
-#SBATCH --exclude=fat[001-002]
-#SBATCH --exclude thin006
 
 # Load modules
 module load openMPI/4.1.5/gnu/12.2.1

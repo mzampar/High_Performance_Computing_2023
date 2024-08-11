@@ -1,9 +1,8 @@
 #!/bin/bash
 
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=64
-#SBATCH --time=02:00:00
+#SBATCH --nodes=4
+#SBATCH --ntasks-per-node=128
+#SBATCH --time=01:00:00
 #SBATCH --partition=EPYC
 #SBATCH --job-name=omp_weak_scaling
 #SBATCH --error=omp_strong_scaling_%j.err
