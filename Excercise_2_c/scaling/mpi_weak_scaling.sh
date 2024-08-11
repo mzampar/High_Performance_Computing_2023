@@ -5,6 +5,7 @@
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
 #SBATCH --job-name=mpi_weak_scaling
+#SBATCH --error=mpi_strong_scaling_%j.err
 #SBATCH --exclusive
 #SBATCH -A dssc
 #SBATCH --exclude=fat[001-002]
@@ -43,7 +44,7 @@ for ((i=1; i<=$repetitions; i++)); do
         rows=$(echo "$BASE_ROWS * sqrt($total_tasks)" | bc -l)
         cols=$(echo "$BASE_COLS * sqrt($total_tasks)" | bc -l)
         echo "Running iteration $i with $total_tasks MPI tasks."
-        elapsed_time=$(mpirun -np $total_tasks ./build/mandelbrot $BASE_COLS $rows -1.5 -1.25 0.5 1.25 255 | grep "Elapsed time:" | awk '{print $3}')
+        elapsed_time=$(mpirun -np $total_tasks ./build/mandelbrot $rows $cols -1.5 -1.25 0.5 1.25 255 | grep "Elapsed time:" | awk '{print $3}')
         echo "$i,$total_tasks,$elapsed_time" >> "$out_csv"
     done
 done
