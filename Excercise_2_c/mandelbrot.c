@@ -25,6 +25,7 @@ int mandelbrot(double cr, double ci, int max_iterations) {
 
 int main(int argc, char *argv[]) {
 
+    // Initialize MPI environment for multi-processes
     int mpi_provided_thread_level;
     MPI_Init_thread(&argc, &argv, MPI_THREAD_FUNNELED, &mpi_provided_thread_level);
     if (mpi_provided_thread_level < MPI_THREAD_FUNNELED) {
@@ -113,29 +114,27 @@ int main(int argc, char *argv[]) {
                     0, MPI_COMM_WORLD); 
         }
 
-int my_color = (my_remainder == 1) ? 1 : MPI_UNDEFINED;
-MPI_Comm sub_comm;
+        int my_sub_comm = (my_remainder == 1) ? 1 : MPI_UNDEFINED;
+        MPI_Comm sub_comm;
 
-MPI_Comm_split(MPI_COMM_WORLD, my_color, rank, &sub_comm);
+        MPI_Comm_split(MPI_COMM_WORLD, my_sub_comm, rank, &sub_comm);
 
-// Now, only processes with `my_remainder == 1` will have `sub_comm` != MPI_COMM_NULL
-if (sub_comm != MPI_COMM_NULL) {
-    int sub_rank, sub_size;
-    MPI_Comm_rank(sub_comm, &sub_rank);
-    MPI_Comm_size(sub_comm, &sub_size);
-    printf("Rank %d has a remainder and belongs to a sub-communicator with subsize %d\n", rank, sub_size);
+        // Now, only processes with `my_remainder == 1` will have `sub_comm` != MPI_COMM_NULL
+        if (sub_comm != MPI_COMM_NULL) {
+            int sub_rank, sub_size;
+            MPI_Comm_rank(sub_comm, &sub_rank);
+            MPI_Comm_size(sub_comm, &sub_size);
+            // Gather data among processes in this sub-communicator
+            if (sub_size >1) {
+            MPI_Gather(local_matrix + my_rows * nx, nx, MPI_CHAR,
+                    gathered_matrix + my_rows * size * nx, nx, MPI_CHAR,
+                    0, sub_comm);
+            } else {
+                memcpy(gathered_matrix + my_rows * size * nx, local_matrix + my_rows * nx, nx);
+            }
 
-    // Gather data among processes in this sub-communicator
-    if (sub_size >1) {
-    MPI_Gather(local_matrix + my_rows * nx, nx, MPI_CHAR,
-               gathered_matrix + my_rows * size * nx, nx, MPI_CHAR,
-               0, sub_comm);
-    } else {
-        memcpy(gathered_matrix + my_rows * size * nx, local_matrix + my_rows * nx, nx);
-    }
-
-    MPI_Comm_free(&sub_comm);
-}
+            MPI_Comm_free(&sub_comm);
+        }
 
         free(local_matrix);
     }
