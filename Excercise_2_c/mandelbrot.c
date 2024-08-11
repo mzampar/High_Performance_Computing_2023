@@ -66,8 +66,8 @@ int main(int argc, char *argv[]) {
             I_max = atoi(argv[7]);  // Maximum number of iterations
     }
 
-    // const int num_threads = omp_get_num_threads();
-    // printf("Number of threads: %d\n", num_threads);
+    const int num_threads = omp_get_num_threads();
+    printf("Number of threads: %d\n", num_threads);
 
     const int my_rows = ny / size;
     const int remainder = ny % size;
