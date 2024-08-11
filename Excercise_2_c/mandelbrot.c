@@ -86,14 +86,14 @@ int main(int argc, char *argv[]) {
 
     const double delta_x = (x_R - x_L) / (nx - 1);
     const double delta_y = (y_R - y_L) / (ny - 1);
-    double cr, ci;
+    //double cr, ci;
 
     // Compute Mandelbrot set for local rows with OpenMP parallelization
-    #pragma omp parallel for schedule(dynamic) collapse(2) private(cr, ci)
+    #pragma omp parallel for schedule(dynamic) collapse(2) //private(cr, ci)
     for (int j = 0; j < my_rows + my_remainder; j++) {
         for (int i = 0; i < nx; i++) {
-            cr = x_L + i * delta_x;
-            ci = y_L + (j * size + rank) * delta_y;
+            double cr = x_L + i * delta_x;
+            double ci = y_L + (j * size + rank) * delta_y;
             local_matrix[j * nx + i] = mandelbrot(cr, ci, I_max);
         }
     }
