@@ -31,7 +31,6 @@ echo "Running OpenMP strong scaling."
 
 for ((i=1; i<=$repetitions; i++)); do
     for threads in "${threads_list[@]}"; do
-
         echo "Running repetition $i with $threads OMP threads..."
         export OMP_NUM_THREADS=$threads
         export OMP_PLACES=cores

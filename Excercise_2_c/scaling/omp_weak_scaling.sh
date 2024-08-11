@@ -27,9 +27,8 @@ repetitions=1
 # Constant amout of work per worker: C = problem size / number of workers
 # Therefore, problem size = C * number of workers 
 
-BASE_ROWS=1000
-BASE_COLS=1000
-
+BASE_ROWS=10000
+BASE_COLS=10000
 
 echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
 
@@ -40,10 +39,8 @@ echo "Running OpenMP weak scaling."
 for ((i=1; i<=$repetitions; i++)); do
     for threads in "${threads_list[@]}"; do
 
-        #rows=$(echo "$BASE_ROWS * sqrt($threads)" | bc -l)
-        #cols=$(echo "$BASE_COLS * sqrt($threads)" | bc -l)
-        let rows=$((BASE_ROWS*threads))
-        let cols=$((BASE_COLS))
+        rows=$(echo "$BASE_ROWS * sqrt($threads)" | bc -l)
+        cols=$(echo "$BASE_COLS * sqrt($threads)" | bc -l)
 
         echo "Running repetition $i with $threads OMP threads..."
         export OMP_NUM_THREADS=$threads
