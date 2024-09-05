@@ -18,7 +18,7 @@ np_values=$(seq 2 1 48)
 map_values="socket node" # tolto core per time limit
 
 # Define filepaths
-src_path="/u/dssc/mzampar/.local/modules/libexec/osu-micro-benchmarks/mpi/collective/"
+src_path="/u/dssc/mzampar/.local/libexec/osu-micro-benchmarks/mpi/collective/"
 out_csv="/u/dssc/mzampar/hpc_project/Excercise_1/bcast/results/bcast_pipeline_socket_node.csv"
 
 # Create the CSV file with header
