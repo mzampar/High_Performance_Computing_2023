@@ -9,6 +9,6 @@
 module load openMPI/4.1.5/gnu
 cd osu-micro-benchmarks-7.3/
 
-./configure CC=/opt/programs/openMPI/4.1.6/bin/mpicc CXX=/opt/programs/openMPI/4.1.6/bin/mpicxx
+./configure --prefix=$HOME/.local CC=/opt/programs/openMPI/4.1.6/bin/mpicc CXX=/opt/programs/openMPI/4.1.6/bin/mpicxx
 make
 make install
