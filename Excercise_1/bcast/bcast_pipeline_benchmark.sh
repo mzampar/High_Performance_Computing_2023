@@ -19,7 +19,7 @@ map_values="socket node" # tolto core per time limit
 
 # Define filepaths
 src_path="/u/dssc/mzampar/.local/libexec/osu-micro-benchmarks/mpi/collective/"
-out_csv="/u/dssc/mzampar/hpc_project/Excercise_1/bcast/results/bcast_pipeline_socket_node.csv"
+out_csv="/u/dssc/mzampar/High_Performance_Computing_2023/Excercise_1/bcast/results/bcast_pipeline_socket_node.csv"
 
 # Create the CSV file with header
 echo "Algorithm,Allocation,Processes,MessageSize,MedianLatency, MinLatency, MaxLatency" > $out_csv
