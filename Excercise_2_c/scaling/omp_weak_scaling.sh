@@ -13,7 +13,7 @@
 
 
 # Load modules
-module load openMPI/4.1.5/gnu/12.2.1
+module load openMPI/4.1.5/gnu/14.2.1
 
 
 # Compile the program
