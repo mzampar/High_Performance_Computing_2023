@@ -6,8 +6,8 @@
 #SBATCH --partition=THIN
 #SBATCH --exclusive
 
-module load openMPI/4.1.5/gnu/14.2.1
-cd osu-micro-benchmarks-7.3/
+module load openMPI/4.1.6/gnu/14.2.1
+cd osu-micro-benchmarks-7.3
 
 ./configure --prefix=$HOME/.local CC=/opt/programs/openMPI/4.1.6/bin/mpicc CXX=/opt/programs/openMPI/4.1.6/bin/mpicxx
 make

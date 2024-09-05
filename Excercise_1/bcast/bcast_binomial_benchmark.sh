@@ -10,7 +10,7 @@
 #SBATCH --exclude=fat[001-002]
 
 # Load the openMPI module
-module load openMPI/4.1.5/gnu/14.2.1
+module load openMPI/4.1.6/gnu/14.2.1
 
 # Define the range of np values
 np_values=$(seq 2 1 48)
