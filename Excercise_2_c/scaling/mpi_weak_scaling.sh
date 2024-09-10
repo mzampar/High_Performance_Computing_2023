@@ -6,12 +6,13 @@
 #SBATCH --partition=EPYC
 #SBATCH --job-name=mpi_weak_scaling
 #SBATCH --error=mpi_weak_scaling_%j.err
-#SBATCH --error=mpi_weak_scaling_%j.out
+#SBATCH --output=mpi_weak_scaling_%j.out
 #SBATCH --exclusive
+#SBATCH --nodelist=epyc001,epyc002
 #SBATCH -A dssc
 
 # Load modules
-module load openMPI/4.1.5/gnu/14.2.1
+module load openMPI/4.1.6/gnu/14.2.1
 
 # Compile the program
 mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
@@ -34,7 +35,7 @@ export OMP_NUM_THREADS=1
 BASE_ROWS=1000
 BASE_COLS=1000
 
-tasks_list=({2..256..2})
+tasks_list=({2..256..4})
 
 echo "Running MPI weak scaling."
 

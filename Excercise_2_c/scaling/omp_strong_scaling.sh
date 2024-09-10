@@ -9,10 +9,11 @@
 #SBATCH --error=omp_strong_scaling_%j.err
 #SBATCH --error=omp_strong_scaling_%j.out
 #SBATCH --exclusive
+#SBATCH --nodelist=epyc001
 #SBATCH -A dssc
 
 # Load modules
-module load openMPI/4.1.5/gnu/14.2.1
+module load openMPI/4.1.6/gnu/14.2.1
 
 # Compile the program
 mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp

@@ -8,6 +8,7 @@
 #SBATCH --error=mpi_weak_scaling_%j.err
 #SBATCH --error=mpi_weak_scaling_%j.out
 #SBATCH --exclusive
+#SBATCH --nodelist=epyc001,epyc002
 #SBATCH -A dssc
 
 # Load modules
@@ -27,7 +28,7 @@ echo "Iteration,Total Tasks,Elapsed Time(s)" > "$out_csv"  # Clear and set heade
 # Number of OpenMP threads
 export OMP_NUM_THREADS=1
 
-tasks_list=({2..256..2})
+tasks_list=({2..256..4})
 
 echo "Running MPI strong scaling."
 
