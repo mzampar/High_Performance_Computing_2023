@@ -34,10 +34,14 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    double start_time, end_time;
+    start_time = MPI_Wtime();
+
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+    // Default parameters
     int nx = 1000;
     int ny = 1000; 
     int I_max = 1000;
@@ -77,8 +81,8 @@ int main(int argc, char *argv[]) {
     // Barrier to synchronize all processes and measure the elapsed time
     MPI_Barrier(MPI_COMM_WORLD);
 
-    double start_time, end_time;
-    start_time = MPI_Wtime();
+    double computation_start_time, computation_end_time, computation_time;
+    computation_start_time = MPI_Wtime();
 
     const double delta_x = (x_R - x_L) / (nx - 1);
     const double delta_y = (y_R - y_L) / (ny - 1);
@@ -95,10 +99,16 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    
-    // end_time = MPI_Wtime();
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    computation_end_time = MPI_Wtime();
+    computation_time = computation_end_time - computation_start_time;
 
     char *gathered_matrix = NULL;
+
+    double gather_start_time, gather_end_time, gathering_time;
+    gather_start_time = MPI_Wtime();
 
     if (size > 1) {
         // Allocate memory for the gathered matrix on rank 0
@@ -139,9 +149,12 @@ int main(int argc, char *argv[]) {
         free(local_matrix);
     }
 
+    gather_end_time = MPI_Wtime();
+    gathering_time = gather_end_time - gather_start_time;
+
     if (rank == 0) {
         FILE *file = fopen("figures/mandelbrot.pgm", "wb");
-        // set the number of different grey levels to 50
+        // Set the number of different grey levels to 50
         fprintf(file, "P5\n%d %d\n50\n", nx, ny);
         if (size > 1) {
             fwrite(gathered_matrix, sizeof(char), nx * ny, file);
@@ -152,6 +165,8 @@ int main(int argc, char *argv[]) {
         }
         end_time = MPI_Wtime();
         printf("Elapsed time: %f\n", end_time - start_time);
+        printf("Computation time: %f\n", computation_time);
+        printf("Gathering time: %f\n", gathering_time);
         fclose(file);
         printf("Image written\n");
     }
