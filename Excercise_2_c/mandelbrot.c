@@ -34,12 +34,9 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    double start_time, end_time;
-    start_time = MPI_Wtime();
-
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size); // Number of processes
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     int nx = 1000;
     int ny = 1000; 
@@ -52,7 +49,7 @@ int main(int argc, char *argv[]) {
     if (argc != 8) {
         if (rank == 0) {
             printf("You are using the default parameters.\n");
-            printf("If you want to set your own parameters you have to run the executable with these arguments: n_x  n_y  x_L  y_L  x_R  y_R  I_max. \n");
+            printf("If you want to set your own parameters you have to run the executable with these arguments: \n n_x  n_y  x_L  y_L  x_R  y_R  I_max. \n");
         }
     }
 
@@ -67,8 +64,6 @@ int main(int argc, char *argv[]) {
     }
 
     const int num_threads = omp_get_num_threads();
-    printf("Number of threads: %d\n", num_threads);
-
     const int my_rows = ny / size;
     const int remainder = ny % size;
     int my_remainder = 0;
@@ -76,13 +71,14 @@ int main(int argc, char *argv[]) {
         my_remainder = 1;
     }
 
-    // printf("Number of rows given to rank %d: %d. \n", rank, my_rows+my_remainder);
-
     // Allocate memory for local matrix
     char *local_matrix = (char *) malloc((my_rows + my_remainder) * nx * sizeof(char));
 
-    // Barrier to synchronize all processes and measure the elapsed time, to check that the workload is balanced
-    // MPI_Barrier(MPI_COMM_WORLD);
+    // Barrier to synchronize all processes and measure the elapsed time
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    double start_time, end_time;
+    start_time = MPI_Wtime();
 
     const double delta_x = (x_R - x_L) / (nx - 1);
     const double delta_y = (y_R - y_L) / (ny - 1);
@@ -90,23 +86,17 @@ int main(int argc, char *argv[]) {
 
     #pragma omp parallel private(cr, ci)
     {
-        char *local_buffer = (char *) malloc(nx * sizeof(char));
         #pragma omp for schedule(dynamic)
         for (int j = 0; j < my_rows + my_remainder; j++) {
             ci = y_L + (j * size + rank) * delta_y;
             for (int i = 0; i < nx; i++) {
                 cr = x_L + i * delta_x;
-                local_buffer[i] = (char)mandelbrot(cr, ci, I_max);
+                local_matrix[j * nx + i] = mandelbrot(cr, ci, I_max);
             }
-            memcpy(local_matrix + j * nx, local_buffer, nx * sizeof(char));
         }
-        free(local_buffer);
     }
     
-
-
     // end_time = MPI_Wtime();
-    // printf("Elapsed time for rank %d: %f\n", rank, end_time - start_time);
 
     char *gathered_matrix = NULL;
 
