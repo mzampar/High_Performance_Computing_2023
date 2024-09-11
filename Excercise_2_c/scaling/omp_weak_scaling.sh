@@ -24,7 +24,7 @@ mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 out_csv="./scaling/results/omp_weak_scaling.csv"
 
 # Number of repetitions
-repetitions=1
+repetitions=5
 
 # Constant amout of work per worker: C = problem size / number of workers
 # Therefore, problem size = C * number of workers 
