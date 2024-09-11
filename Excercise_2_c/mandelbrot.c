@@ -3,6 +3,7 @@
 #include <mpi.h>
 #include <omp.h>
 #include <string.h>
+#define WRITE_IMAGE 0
 
 // Function to update the complex values zr and zi using the Mandelbrot equation
 void f_c(double *zr, double *zi, double cr, double ci) {
@@ -145,22 +146,26 @@ int main(int argc, char *argv[]) {
     gathering_time = gather_end_time - gather_start_time;
 
     if (rank == 0) {
-        FILE *file = fopen("figures/mandelbrot.pgm", "wb");
-        // Set the number of different grey levels to 50
-        fprintf(file, "P5\n%d %d\n50\n", nx, ny);
-        if (size > 1) {
-            fwrite(gathered_matrix, sizeof(char), nx * ny, file);
-            free(gathered_matrix);
-        } else {
-            fwrite(local_matrix, sizeof(char), nx * ny, file);
-            free(local_matrix);
-        }
         end_time = MPI_Wtime();
         printf("Elapsed time: %f\n", end_time - start_time);
         printf("Computation time: %f\n", computation_time);
         printf("Gathering time: %f\n", gathering_time);
-        fclose(file);
-        printf("Image written\n");
+
+        // We don't count the time to write the image because it is serial
+        if (WRITE_IMAGE) {
+            FILE *file = fopen("figures/mandelbrot.pgm", "wb");
+            // Set the number of different grey levels to 50
+            fprintf(file, "P5\n%d %d\n50\n", nx, ny);
+            if (size > 1) {
+                fwrite(gathered_matrix, sizeof(char), nx * ny, file);
+                free(gathered_matrix);
+            } else {
+                fwrite(local_matrix, sizeof(char), nx * ny, file);
+                free(local_matrix);
+            }
+            fclose(file);
+            printf("Image written\n");
+        }
     }
     
     MPI_Finalize();
