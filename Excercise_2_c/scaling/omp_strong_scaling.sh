@@ -2,7 +2,7 @@
 
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=64
+#SBATCH --cpus-per-task=128
 #SBATCH --time=00:45:00
 #SBATCH --partition=EPYC
 #SBATCH --job-name=omp_strong_scaling
@@ -21,7 +21,7 @@ mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 out_csv="./scaling/results/omp_strong_scaling.csv"
 
 # Number of repetitions
-repetitions=5
+repetitions=3
 
 echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
 

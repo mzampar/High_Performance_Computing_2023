@@ -2,12 +2,12 @@
 
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=64
+#SBATCH --cpus-per-task=128
 #SBATCH --time=00:45:00
 #SBATCH --partition=EPYC
 #SBATCH --job-name=omp_weak_scaling
-#SBATCH --error=omp_strong_scaling_%j.err
-#SBATCH --error=omp_strong_scaling_%j.out
+#SBATCH --error=omp_weak_scaling_%j.err
+#SBATCH --error=omp_weak_scaling_%j.out
 #SBATCH --exclusive
 #SBATCH -A dssc
 
@@ -23,18 +23,18 @@ mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 out_csv="./scaling/results/omp_weak_scaling.csv"
 
 # Number of repetitions
-repetitions=5
+repetitions=3
 
 # Constant amout of work per worker: C = problem size / number of workers
 # Therefore, problem size = C * number of workers 
 
-BASE_ROWS=2500
-BASE_COLS=2500
+BASE_ROWS=2000
+BASE_COLS=2000
 
 echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
 
 lst1=(1 2 4 8)
-lst2=({16..64..8})
+lst2=({16..128..8})
 threads_list=("${lst1[@]}" "${lst2[@]}")
 
 echo "Running OpenMP weak scaling."

@@ -20,7 +20,7 @@ mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 out_csv="./scaling/results/mpi_weak_scaling.csv"
 
 # Number of repetitions
-repetitions=5
+repetitions=3
 
 echo "Iteration,Total Tasks,Elapsed Time(s),Computation Time(s),Gathering Time(s)" > "$out_csv"  # Clear and set header
 
@@ -30,11 +30,11 @@ export OMP_NUM_THREADS=1
 # Constant amout of work per worker: C = problem size / number of workers
 # Therefore, problem size = C * number of workers 
 
-BASE_ROWS=5000
-BASE_COLS=5000
+BASE_ROWS=2000
+BASE_COLS=2000
 
 lst1=(1 2 4 8)
-lst2=({16..128..8})
+lst2=({16..256..8})
 tasks_list=("${lst1[@]}" "${lst2[@]}")
 
 echo "Running MPI weak scaling."
