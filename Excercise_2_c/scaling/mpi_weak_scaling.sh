@@ -2,7 +2,7 @@
 
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=128
-#SBATCH --time=01:00:00
+#SBATCH --time=00:30:00
 #SBATCH --partition=EPYC
 #SBATCH --job-name=mpi_weak_scaling
 #SBATCH --error=mpi_weak_scaling_%j.err
