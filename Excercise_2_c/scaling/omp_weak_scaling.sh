@@ -28,8 +28,8 @@ repetitions=5
 # Constant amout of work per worker: C = problem size / number of workers
 # Therefore, problem size = C * number of workers 
 
-BASE_ROWS=10000
-BASE_COLS=10000
+BASE_ROWS=5000
+BASE_COLS=5000
 
 echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
 
