@@ -86,11 +86,11 @@ int main(int argc, char *argv[]) {
 
     const double delta_x = (x_R - x_L) / (nx - 1);
     const double delta_y = (y_R - y_L) / (ny - 1);
-    double cr, ci;
 
-    #pragma omp parallel private(cr, ci)
+    #pragma omp parallel
     {
         #pragma omp for schedule(dynamic)
+        double cr, ci;
         for (int j = 0; j < my_rows + my_remainder; j++) {
             ci = y_L + (j * size + rank) * delta_y;
             for (int i = 0; i < nx; i++) {
