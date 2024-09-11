@@ -28,7 +28,7 @@ echo "Iteration,Total Tasks,Elapsed Time(s),Computation Time(s),Gathering Time(s
 # Number of OpenMP threads
 export OMP_NUM_THREADS=1
 
-tasks_list=({2..256..4})
+tasks_list=({2..256..8})
 
 echo "Running MPI strong scaling."
 
@@ -37,7 +37,7 @@ for ((i=1; i<=$repetitions; i++)); do
 
         echo "Running iteration $i with $total_tasks MPI tasks."
 
-        output=$(mpirun -np $total_tasks ./build/mandelbrot 20000 20000 -1.5 -1.25 0.5 1.25 255)
+        output=$(mpirun -np $total_tasks ./build/mandelbrot 50000 50000 -1.5 -1.25 0.5 1.25 255)
         
         elapsed_time=$(echo "$output" | grep "Elapsed time:" | awk '{print $3}')
         computation_time=$(echo "$output" | grep "Computation time:" | awk '{print $3}')

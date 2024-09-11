@@ -21,11 +21,11 @@ mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 out_csv="./scaling/results/omp_strong_scaling.csv"
 
 # Number of repetitions
-repetitions=5
+repetitions=1
 
 echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
 
-threads_list=({8..64..8})
+threads_list=({8..128..8})
 
 echo "Running OpenMP strong scaling."
 
@@ -35,7 +35,7 @@ for ((i=1; i<=$repetitions; i++)); do
         export OMP_NUM_THREADS=$threads
         export OMP_PLACES=cores
         export OMP_PROC_BIND=close
-        elapsed_time=$(mpirun -np 1 --map-by socket --bind-to socket ./build/mandelbrot 20000 20000 -1.5 -1.25 0.5 1.25 255 | grep "Elapsed time:" | awk '{print $3}')
+        elapsed_time=$(mpirun -np 1 --map-by socket --bind-to socket ./build/mandelbrot 10000 10000 -1.5 -1.25 0.5 1.25 255 | grep "Elapsed time:" | awk '{print $3}')
         echo "$i,$threads,$elapsed_time" >> "$out_csv"
     done
 done
