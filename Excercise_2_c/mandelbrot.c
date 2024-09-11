@@ -115,15 +115,15 @@ int main(int argc, char *argv[]) {
         if (rank == 0) {
             gathered_matrix = (char *) malloc(ny * nx * sizeof(char));
         }
-        for (int j = 0; j < my_rows + my_remainder; j++) {
+        for (int j = 0; j < my_rows; j++) {
             // Gather the row from each process into the gathered_matrix
             MPI_Gather(local_matrix + j * nx, nx, MPI_CHAR,
                     gathered_matrix + j * size * nx, nx, MPI_CHAR,
                     0, MPI_COMM_WORLD); 
         }
         // Cannot simply use a for with j < my_rows + my_remainder because the MPI_Gather 
-        // expects the same number of elements from each process, if some processes don't get to the 
-        // gather we get stuck on the gather.
+        // expects the same number of elements from each process, if some processes don't get to 
+        // the gather we get stuck on the gather.
         
         int my_sub_comm = (my_remainder == 1) ? 1 : MPI_UNDEFINED;
         MPI_Comm sub_comm;
@@ -137,7 +137,6 @@ int main(int argc, char *argv[]) {
             MPI_Comm_size(sub_comm, &sub_size);
             // Gather data among processes in this sub-communicator
             if (sub_size > 1) {
-                printf("Rank %d in sub_comm %d\n", rank, sub_rank);
                 MPI_Gather(local_matrix + my_rows * nx, nx, MPI_CHAR,
                         gathered_matrix + my_rows * size * nx, nx, MPI_CHAR,
                         0, sub_comm);
