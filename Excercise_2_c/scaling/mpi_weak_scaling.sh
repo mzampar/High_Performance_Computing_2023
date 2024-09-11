@@ -8,7 +8,6 @@
 #SBATCH --error=mpi_weak_scaling_%j.err
 #SBATCH --output=mpi_weak_scaling_%j.out
 #SBATCH --exclusive
-#SBATCH --nodelist=epyc001,epyc002
 #SBATCH -A dssc
 
 # Load modules
@@ -31,10 +30,10 @@ export OMP_NUM_THREADS=1
 # Constant amout of work per worker: C = problem size / number of workers
 # Therefore, problem size = C * number of workers 
 
-BASE_ROWS=1000
-BASE_COLS=1000
+BASE_ROWS=5000
+BASE_COLS=5000
 
-tasks_list=({2..256..4})
+tasks_list=({4..128..4})
 
 echo "Running MPI weak scaling."
 
