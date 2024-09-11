@@ -25,7 +25,7 @@ repetitions=5
 
 echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
 
-threads_list=({8..128..8})
+threads_list=({2..128..2})
 
 echo "Running OpenMP strong scaling."
 

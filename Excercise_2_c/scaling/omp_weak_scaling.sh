@@ -33,7 +33,7 @@ BASE_COLS=5000
 
 echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
 
-threads_list=({4..64..4})
+threads_list=({2..64..2})
 
 echo "Running OpenMP weak scaling."
 
