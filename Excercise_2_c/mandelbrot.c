@@ -89,8 +89,8 @@ int main(int argc, char *argv[]) {
 
     #pragma omp parallel
     {
-        #pragma omp for schedule(dynamic)
         double cr, ci;
+        #pragma omp for schedule(dynamic)
         for (int j = 0; j < my_rows + my_remainder; j++) {
             ci = y_L + (j * size + rank) * delta_y;
             for (int i = 0; i < nx; i++) {
