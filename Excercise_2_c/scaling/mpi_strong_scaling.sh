@@ -29,7 +29,7 @@ export OMP_NUM_THREADS=1
 
 lst1=(1 2 4 8)
 lst2=({16..256..16})
-tasks_list_list=("${lst1[@]}" "${lst2[@]}")
+tasks_list=("${lst1[@]}" "${lst2[@]}")
 
 echo "Running MPI strong scaling."
 
