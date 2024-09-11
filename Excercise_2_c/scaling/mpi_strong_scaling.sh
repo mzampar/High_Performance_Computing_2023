@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=128
 #SBATCH --time=01:00:00
 #SBATCH --partition=EPYC
-#SBATCH --job-name=mpi_weak_scaling
+#SBATCH --job-name=mpi_strong_scaling
 #SBATCH --error=mpi_weak_scaling_%j.err
 #SBATCH --error=mpi_weak_scaling_%j.out
 #SBATCH --exclusive
