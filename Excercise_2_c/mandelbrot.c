@@ -132,18 +132,9 @@ int main(int argc, char *argv[]) {
 
         // Only processes with `my_remainder == 1` will have `sub_comm` != MPI_COMM_NULL
         if (sub_comm != MPI_COMM_NULL) {
-            int sub_rank, sub_size;
-            MPI_Comm_rank(sub_comm, &sub_rank);
-            MPI_Comm_size(sub_comm, &sub_size);
-            // Gather data among processes in this sub-communicator
-            if (sub_size > 1) {
-                MPI_Gather(local_matrix + my_rows * nx, nx, MPI_CHAR,
+           MPI_Gather(local_matrix + my_rows * nx, nx, MPI_CHAR,
                         gathered_matrix + my_rows * size * nx, nx, MPI_CHAR,
                         0, sub_comm);
-            } else { // If there is only one process in the sub-communicator rank 0 will write the last row to the gathered_matrix
-                memcpy(gathered_matrix + my_rows * size * nx, local_matrix + my_rows * nx, nx);
-            }
-
             MPI_Comm_free(&sub_comm);
         }
         
