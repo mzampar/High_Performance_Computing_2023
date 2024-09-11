@@ -5,13 +5,13 @@
 #SBATCH --time=00:45:00
 #SBATCH --partition=EPYC
 #SBATCH --job-name=mpi_strong_scaling
-#SBATCH --error=mpi_weak_scaling_%j.err
-#SBATCH --error=mpi_weak_scaling_%j.out
+#SBATCH --error=mpi_strong_scaling_%j.err
+#SBATCH --error=mpi_strong_scaling_%j.out
 #SBATCH --exclusive
 #SBATCH -A dssc
 
 # Load modules
-module load  openMPI/4.1.6/gnu/14.2.1
+module load openMPI/4.1.6/gnu/14.2.1
 
 # Compile the program
 mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
@@ -29,7 +29,7 @@ export OMP_NUM_THREADS=1
 
 lst1=(1 2 4 8)
 lst2=({16..256..16})
-threads_list=("${lst1[@]}" "${lst2[@]}")
+tasks_list_list=("${lst1[@]}" "${lst2[@]}")
 
 echo "Running MPI strong scaling."
 

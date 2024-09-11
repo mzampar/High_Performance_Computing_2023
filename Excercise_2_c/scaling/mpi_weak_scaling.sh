@@ -35,7 +35,7 @@ BASE_COLS=5000
 
 lst1=(1 2 4 8)
 lst2=({16..128..8})
-threads_list=("${lst1[@]}" "${lst2[@]}")
+tasks_list=("${lst1[@]}" "${lst2[@]}")
 
 echo "Running MPI weak scaling."
 
