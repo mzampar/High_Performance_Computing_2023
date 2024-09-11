@@ -9,7 +9,6 @@
 #SBATCH --error=omp_strong_scaling_%j.err
 #SBATCH --error=omp_strong_scaling_%j.out
 #SBATCH --exclusive
-#SBATCH --nodelist=epyc001
 #SBATCH -A dssc
 
 # Load modules
