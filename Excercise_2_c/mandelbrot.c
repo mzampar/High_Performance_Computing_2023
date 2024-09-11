@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
     #pragma omp parallel
     {
         double cr, ci;
-        #pragma omp for schedule(dynamic)
+        #pragma omp for schedule(dynamic) // Dynamic scheduling to balance the load, since some rows are more complex than others
         for (int j = 0; j < my_rows + my_remainder; j++) {
             ci = y_L + (j * size + rank) * delta_y;
             for (int i = 0; i < nx; i++) {
