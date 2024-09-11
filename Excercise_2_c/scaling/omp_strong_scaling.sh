@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=64
-#SBATCH --time=00:30:00
+#SBATCH --time=00:45:00
 #SBATCH --partition=EPYC
 #SBATCH --job-name=omp_strong_scaling
 #SBATCH --error=omp_strong_scaling_%j.err
