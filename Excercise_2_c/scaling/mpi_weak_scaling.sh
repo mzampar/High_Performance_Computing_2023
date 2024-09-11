@@ -33,7 +33,9 @@ export OMP_NUM_THREADS=1
 BASE_ROWS=5000
 BASE_COLS=5000
 
-tasks_list=({4..128..4})
+lst1=(1 2 4 8)
+lst2=({16..128..8})
+threads_list=("${lst1[@]}" "${lst2[@]}")
 
 echo "Running MPI weak scaling."
 
