@@ -4,10 +4,12 @@
 #SBATCH --ntasks-per-node=24
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
+#SBATCH --nodelist=thin001,thin002
 #SBATCH --job-name=HPC_ex01_bcast_default
+#SBATCH --error=mpi_weak_scaling_%j.err
+#SBATCH --output=mpi_weak_scaling_%j.out
 #SBATCH --exclusive
 #SBATCH -A dssc
-#SBATCH --exclude=fat[001-002]
 
 # Load the openMPI module
 module load openMPI/4.1.6/gnu/14.2.1
