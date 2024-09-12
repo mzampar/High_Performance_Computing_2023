@@ -36,7 +36,7 @@ done
 echo "Measuring latencies between $NODE1 and $NODE2..."
 
 for ((i=0; i<$CORES_PER_NODE; i++)); do
-    for ((j=0; j<$CORES_PER_NODE; j++)); do
+    for ((j=i; j<$CORES_PER_NODE; j++)); do
         echo "Running latency between core $i on $NODE1 and core $j on $NODE2..."
         LATENCY=$(mpirun -np 2 --host $NODE1,$NODE2 --cpu-list $i,$j $OSU_LATENCY_EXEC)
         echo "$LATENCY" >> $OUTFILE
