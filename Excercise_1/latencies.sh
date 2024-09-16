@@ -23,23 +23,21 @@ OUTFILE="latency_results.csv"
 echo "Core1,Core2,Latency(us)" > $OUTFILE
 
 # Measure latencies within a single node
-echo "Measuring latencies within $NODE1..."
+echo "Measuring latencies within $NODE1..." >> $OUTFILE
 
 for ((i=0; i<$CORES_PER_NODE; i++)); do
     for ((j=i+1; j<$CORES_PER_NODE; j++)); do
-        echo "Running latency between core $i and core $j on $NODE1..."
+        echo "Running latency between core $i and core $j on $NODE1..." >> $OUTFILE
         LATENCY=$(mpirun -np 2 --host thin001 --cpu-list $i,$j $OSU_LATENCY_EXEC)
-        echo "$LATENCY" >> $OUTFILE
     done
 done
 
-echo "Measuring latencies between $NODE1 and $NODE2..."
+echo "Measuring latencies between $NODE1 and $NODE2..." >> $OUTFILE
 
 for ((i=0; i<$CORES_PER_NODE; i++)); do
     for ((j=i; j<$CORES_PER_NODE; j++)); do
-        echo "Running latency between core $i on $NODE1 and core $j on $NODE2..."
+        echo "Running latency between core $i on $NODE1 and core $j on $NODE2..." >> $OUTFILE
         LATENCY=$(mpirun -np 2 --host $NODE1,$NODE2 --cpu-list $i,$j $OSU_LATENCY_EXEC)
-        echo "$LATENCY" >> $OUTFILE
     done
 done
 
