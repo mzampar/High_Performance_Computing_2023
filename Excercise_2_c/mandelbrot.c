@@ -5,6 +5,55 @@
 #include <string.h>
 #define WRITE_IMAGE 0
 
+
+void convert_bin_to_pgm(const char *bin_filename, const char *pgm_filename, int width, int height) {
+    FILE *bin_file = fopen(bin_filename, "rb");
+    FILE *pgm_file = fopen(pgm_filename, "wb");
+
+    if (bin_file == NULL) {
+        perror("Error opening binary file");
+        exit(EXIT_FAILURE);
+    }
+
+    if (pgm_file == NULL) {
+        perror("Error opening PGM file");
+        fclose(bin_file);
+        exit(EXIT_FAILURE);
+    }
+
+    // Write the PGM header
+    fprintf(pgm_file, "P5\n%d %d\n255\n", width, height);
+
+    // Allocate buffer for reading binary data
+    size_t buffer_size = width * height;
+    unsigned char *buffer = (unsigned char *)malloc(buffer_size);
+
+    if (buffer == NULL) {
+        perror("Error allocating memory");
+        fclose(bin_file);
+        fclose(pgm_file);
+        exit(EXIT_FAILURE);
+    }
+
+    // Read binary data into buffer
+    size_t read_size = fread(buffer, 1, buffer_size, bin_file);
+    if (read_size != buffer_size) {
+        perror("Error reading binary data");
+        free(buffer);
+        fclose(bin_file);
+        fclose(pgm_file);
+        exit(EXIT_FAILURE);
+    }
+
+    // Write binary data to PGM file
+    fwrite(buffer, 1, buffer_size, pgm_file);
+
+    // Clean up
+    free(buffer);
+    fclose(bin_file);
+    fclose(pgm_file);
+}
+
 // Function to update the complex values zr and zi using the Mandelbrot equation
 void f_c(double *zr, double *zi, double cr, double ci) {
     double zr_new = (*zr) * (*zr) - (*zi) * (*zi) + cr;
@@ -68,7 +117,6 @@ int main(int argc, char *argv[]) {
             I_max = atoi(argv[7]);  // Maximum number of iterations
     }
 
-    const int num_threads = omp_get_num_threads();
     const int my_rows = ny / size;
     const int remainder = ny % size;
     int my_remainder = 0;
@@ -106,68 +154,38 @@ int main(int argc, char *argv[]) {
     computation_end_time = MPI_Wtime();
     computation_time = computation_end_time - computation_start_time;
 
-    char *gathered_matrix = NULL;
+    const char *bin_filename = "./figures/mandelbrot_parallel.bin";
+    const char *pgm_filename = "./figures/mandelbrot_parallel.pgm";
 
-    double gather_start_time, gather_end_time, gathering_time;
-    gather_start_time = MPI_Wtime();
+    // Open file for writing binary data
+    MPI_File fh;
+    MPI_File_open(MPI_COMM_WORLD, bin_filename, MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
+    MPI_Offset row_offset;
 
-    if (size > 1) {
-        // Allocate memory for the gathered matrix on rank 0
-        if (rank == 0) {
-            gathered_matrix = (char *) malloc(ny * nx * sizeof(char));
-        }
-        for (int j = 0; j < my_rows; j++) {
-            // Gather the row from each process into the gathered_matrix
-            MPI_Gather(local_matrix + j * nx, nx, MPI_CHAR,
-                    gathered_matrix + j * size * nx, nx, MPI_CHAR,
-                    0, MPI_COMM_WORLD); 
-        }
-        // Cannot simply use a for with j < my_rows + my_remainder because the MPI_Gather 
-        // expects the same number of elements from each process, if some processes don't get to 
-        // the gather we get stuck on the gather.
-        
-        int my_sub_comm = (my_remainder == 1) ? 1 : MPI_UNDEFINED;
-        MPI_Comm sub_comm;
-
-        MPI_Comm_split(MPI_COMM_WORLD, my_sub_comm, rank, &sub_comm);
-
-        // Only processes with `my_remainder == 1` will have `sub_comm` != MPI_COMM_NULL
-        if (sub_comm != MPI_COMM_NULL) {
-           MPI_Gather(local_matrix + my_rows * nx, nx, MPI_CHAR,
-                        gathered_matrix + my_rows * size * nx, nx, MPI_CHAR,
-                        0, sub_comm);
-            MPI_Comm_free(&sub_comm);
-        }
-        
-        free(local_matrix);
+    for (int i = 0; i < my_rows; i++) {
+        row_offset =  rank * nx + size * i * nx;
+        MPI_File_write_at_all(fh, row_offset, local_matrix + i * nx, nx, MPI_CHAR, MPI_STATUS_IGNORE);
     }
 
-    gather_end_time = MPI_Wtime();
-    gathering_time = gather_end_time - gather_start_time;
+    // Write remainder rows
+    if (my_remainder == 1) {
+        MPI_Offset remainder_offset = rank * nx + size * my_rows * nx;
+        MPI_File_write_at(fh, remainder_offset, local_matrix + (my_rows * nx), nx, MPI_CHAR, MPI_STATUS_IGNORE);
+    }
+
+    // Close the file
+    MPI_File_close(&fh);
 
     if (rank == 0) {
-        end_time = MPI_Wtime();
-        printf("Elapsed time: %f\n", end_time - start_time);
-        printf("Computation time: %f\n", computation_time);
-        printf("Gathering time: %f\n", gathering_time);
-
-        // We don't count the time to write the image because it is serial
-        if (WRITE_IMAGE) {
-            FILE *file = fopen("figures/mandelbrot.pgm", "wb");
-            // Set the number of different grey levels to 50
-            fprintf(file, "P5\n%d %d\n50\n", nx, ny);
-            if (size > 1) {
-                fwrite(gathered_matrix, sizeof(char), nx * ny, file);
-                free(gathered_matrix);
-            } else {
-                fwrite(local_matrix, sizeof(char), nx * ny, file);
-                free(local_matrix);
-            }
-            fclose(file);
-            printf("Image written\n");
-        }
+        convert_bin_to_pgm(bin_filename, pgm_filename, nx, ny);
     }
     
+
     MPI_Finalize();
     return 0;
 }
+
+
+
+
+
