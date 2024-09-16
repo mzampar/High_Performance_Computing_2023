@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --time=00:30:00
 #SBATCH --partition=THIN
-#SBATCH --nodelist=thin001,thin002
+#SBATCH --nodelist=thin009,thin010
 #SBATCH --job-name=HPC_ex01
 #SBATCH --exclusive
 #SBATCH -A dssc
@@ -13,8 +13,8 @@
 module load openMPI/4.1.6/gnu/14.2.1
 
 CORES_PER_NODE=24
-NODE1="thin001"
-NODE2="thin002"
+NODE1="thin009"
+NODE2="thin010"
 
 OSU_LATENCY_EXEC="/u/dssc/mzampar/.local/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency"
 
