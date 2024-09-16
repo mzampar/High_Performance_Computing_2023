@@ -14,4 +14,4 @@ module load openMPI/4.1.6/gnu/14.2.1
 
 module load hwloc/2.10.0
 
-srun -n1 lstopo out.svg
+srun -n1 --cpus-per-task=24 lstopo out.svg
