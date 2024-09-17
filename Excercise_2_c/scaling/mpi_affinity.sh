@@ -20,7 +20,7 @@ mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 out_csv="./scaling/results/mpi_affinity.csv"
 
 
-echo "Iteration,Total Tasks,Mapping,Binding,Elapsed Time(s),Computation Time(s),Write Time(s)" > "$out_csv"  # Clear and set header
+echo "Iteration,Total Tasks,Mapping,Binding,Elapsed Time(s),Computation Time(s),Gathering Time(s)" > "$out_csv"  # Clear and set header
 
 # Number of OpenMP threads
 export OMP_NUM_THREADS=1
@@ -45,7 +45,7 @@ for total_tasks in "${tasks_list[@]}"; do
 
             elapsed_time=$(echo "$output" | grep "Elapsed time:" | awk '{print $3}')
             computation_time=$(echo "$output" | grep "Computation time:" | awk '{print $3}')
-            writing_time=$(echo "$output" | grep "Write time:" | awk '{print $3}')        
+            writing_time=$(echo "$output" | grep "Gathering time:" | awk '{print $3}')        
             echo "$i,$total_tasks,$map_by,$bind_to,$elapsed_time,$computation_time,$writing_time" >> "$out_csv"
         done
     done
