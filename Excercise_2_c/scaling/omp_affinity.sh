@@ -3,12 +3,11 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=64
-#SBATCH --time=01:00:00
+#SBATCH --time=00:30:00
 #SBATCH --partition=EPYC
 #SBATCH --job-name=omp_affinity
 #SBATCH --error=omp_affinity_%j.err
 #SBATCH --error=omp_affinity_%j.out
-#SBATCH --exclusive
 #SBATCH -A dssc
 
 # 64 threads per node because one process can be bound to one socket/cpu

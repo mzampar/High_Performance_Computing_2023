@@ -8,7 +8,6 @@
 #SBATCH --job-name=omp_strong_scaling
 #SBATCH --error=omp_strong_scaling_%j.err
 #SBATCH --error=omp_strong_scaling_%j.out
-#SBATCH --exclusive
 #SBATCH -A dssc
 
 # 64 threads per node because one process can be bound to one socket/cpu
