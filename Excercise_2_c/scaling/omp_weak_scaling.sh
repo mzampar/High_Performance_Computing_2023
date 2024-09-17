@@ -2,19 +2,21 @@
 
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=128
+#SBATCH --cpus-per-task=64
 #SBATCH --time=01:00:00
 #SBATCH --partition=EPYC
 #SBATCH --job-name=omp_weak_scaling
 #SBATCH --error=omp_weak_scaling_%j.err
 #SBATCH --error=omp_weak_scaling_%j.out
-#SBATCH --exclusive
 #SBATCH -A dssc
 
+# 64 threads per node because one process can be bound to one socket/cpu
+# (it is not possible to bind a process to an entire node)
+# Therefore, 64 threads per node because there are 64 cores per socket in an epyc node
+# We use 128 threads to check how SMT works
 
 # Load modules
 module load openMPI/4.1.6/gnu/14.2.1
-
 
 # Compile the program
 mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
