@@ -3,75 +3,9 @@
 #include <mpi.h>
 #include <omp.h>
 #include <string.h>
-#define WRITE_IMAGE 0
+#include "utils.h"
+#define WRITE_PGM_IMAGE 0 // Compile with -DWRITE_IMAGE=1 to write the pgm image
 
-
-void convert_bin_to_pgm(const char *bin_filename, const char *pgm_filename, int width, int height) {
-    FILE *bin_file = fopen(bin_filename, "rb");
-    FILE *pgm_file = fopen(pgm_filename, "wb");
-
-    if (bin_file == NULL) {
-        perror("Error opening binary file");
-        exit(EXIT_FAILURE);
-    }
-
-    if (pgm_file == NULL) {
-        perror("Error opening PGM file");
-        fclose(bin_file);
-        exit(EXIT_FAILURE);
-    }
-
-    // Write the PGM header
-    fprintf(pgm_file, "P5\n%d %d\n255\n", width, height);
-
-    // Allocate buffer for reading binary data
-    size_t buffer_size = width * height;
-    unsigned char *buffer = (unsigned char *)malloc(buffer_size);
-
-    if (buffer == NULL) {
-        perror("Error allocating memory");
-        fclose(bin_file);
-        fclose(pgm_file);
-        exit(EXIT_FAILURE);
-    }
-
-    // Read binary data into buffer
-    size_t read_size = fread(buffer, 1, buffer_size, bin_file);
-    if (read_size != buffer_size) {
-        perror("Error reading binary data");
-        free(buffer);
-        fclose(bin_file);
-        fclose(pgm_file);
-        exit(EXIT_FAILURE);
-    }
-
-    // Write binary data to PGM file
-    fwrite(buffer, 1, buffer_size, pgm_file);
-
-    // Clean up
-    free(buffer);
-    fclose(bin_file);
-    fclose(pgm_file);
-}
-
-// Function to update the complex values zr and zi using the Mandelbrot equation
-void f_c(double *zr, double *zi, double cr, double ci) {
-    double zr_new = (*zr) * (*zr) - (*zi) * (*zi) + cr;
-    double zi_new = 2 * (*zr) * (*zi) + ci;
-    *zr = zr_new;
-    *zi = zi_new;
-}
-
-// Function to check if a complex point belongs to the Mandelbrot set
-int mandelbrot(double cr, double ci, int max_iterations) {
-    double zr = 0.0, zi = 0.0;
-    short iter = 0;
-    while (zr * zr + zi * zi < 4.0 && iter < max_iterations) {
-        f_c(&zr, &zi, cr, ci); // Update zr and zi using the Mandelbrot equation
-        iter++;
-    }
-    return iter; // Return the number of iterations
-}
 
 int main(int argc, char *argv[]) {
 
@@ -176,7 +110,7 @@ int main(int argc, char *argv[]) {
     // Close the file
     MPI_File_close(&fh);
 
-    if (rank == 0) {
+    if (rank == 0 && WRITE_PGM_IMAGE) {
         convert_bin_to_pgm(bin_filename, pgm_filename, nx, ny);
     }
     
