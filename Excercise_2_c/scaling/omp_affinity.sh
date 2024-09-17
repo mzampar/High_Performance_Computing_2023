@@ -19,8 +19,6 @@
 # Load modules
 module load openMPI/4.1.6/gnu/14.2.1
 
-#!/bin/bash
-
 # Compile the program
 mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c ./build/utils.c -Ibuild -lm -fopenmp
 
