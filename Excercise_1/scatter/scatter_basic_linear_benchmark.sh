@@ -5,6 +5,7 @@
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
 #SBATCH --job-name=HPC_ex01_scatter_default
+#SBATCH --nodelist=thin005,thin006
 #SBATCH --exclusive
 #SBATCH -A dssc
 #SBATCH --exclude=fat[001-002]
