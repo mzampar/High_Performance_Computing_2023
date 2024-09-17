@@ -3,7 +3,7 @@
 #include <mpi.h>
 #include <omp.h>
 #include <string.h>
-#define WRITE_IMAGE 0 // Compile with -DWRITE_IMAGE=1 to write the image
+#define WRITE_IMAGE 1 // Compile with -DWRITE_IMAGE=1 to write the image
 
 // Function to update the complex values zr and zi using the Mandelbrot equation
 void f_c(double *zr, double *zi, double cr, double ci) {
@@ -68,7 +68,6 @@ int main(int argc, char *argv[]) {
             I_max = atoi(argv[7]);  // Maximum number of iterations
     }
 
-    const int num_threads = omp_get_num_threads();
     const int my_rows = ny / size;
     const int remainder = ny % size;
     int my_remainder = 0;
@@ -155,7 +154,7 @@ int main(int argc, char *argv[]) {
         if (WRITE_IMAGE) {
             FILE *file = fopen("figures/mandelbrot.pgm", "wb");
             // Set the number of different grey levels to 50
-            fprintf(file, "P5\n%d %d\n50\n", nx, ny);
+            fprintf(file, "P5\n%d %d\n255\n", nx, ny);
             if (size > 1) {
                 fwrite(gathered_matrix, sizeof(char), nx * ny, file);
                 free(gathered_matrix);
