@@ -4,9 +4,9 @@
 #SBATCH --ntasks-per-node=128
 #SBATCH --time=00:45:00
 #SBATCH --partition=EPYC
-#SBATCH --job-name=mpi_strong_scaling
-#SBATCH --error=mpi_strong_scaling_%j.err
-#SBATCH --output=mpi_strong_scaling_%j.out
+#SBATCH --job-name=mpi_affinity
+#SBATCH --error=mpi_affinity_%j.err
+#SBATCH --output=mpi_affinity_%j.out
 #SBATCH --exclusive
 #SBATCH -A dssc
 
