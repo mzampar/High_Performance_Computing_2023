@@ -22,7 +22,7 @@ out_csv="./scaling/results/mpi_weak_scaling.csv"
 # Number of repetitions
 repetitions=5
 
-echo "Iteration,Total Tasks,Elapsed Time(s),Computation Time(s),Gathering Time(s)" > "$out_csv"  # Clear and set header
+echo "Iteration,Total Tasks,Elapsed Time(s),Computation Time(s),Write Time(s)" > "$out_csv"  # Clear and set header
 
 # Number of OpenMP threads
 export OMP_NUM_THREADS=1
@@ -45,10 +45,12 @@ for ((i=1; i<=$repetitions; i++)); do
         cols=$(echo "$BASE_COLS * sqrt($total_tasks)" | bc -l)
         echo "Running iteration $i with $total_tasks MPI tasks."
         output=$(mpirun -np $total_tasks ./build/mandelbrot $rows $cols -1.5 -1.25 0.5 1.25 255)
+
         elapsed_time=$(echo "$output" | grep "Elapsed time:" | awk '{print $3}')
         computation_time=$(echo "$output" | grep "Computation time:" | awk '{print $3}')
-        gathering_time=$(echo "$output" | grep "Gathering time:" | awk '{print $3}')        
-        echo "$i,$total_tasks,$elapsed_time,$computation_time,$gathering_time" >> "$out_csv"
+        writing_time=$(echo "$output" | grep "Write time:" | awk '{print $3}')
+
+        echo "$i,$total_tasks,$elapsed_time,$computation_time,$writing_time" >> "$out_csv"
     done
 done
 

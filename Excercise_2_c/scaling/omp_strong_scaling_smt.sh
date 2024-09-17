@@ -23,7 +23,7 @@ out_csv="./scaling/results/omp_strong_scaling_smt.csv"
 # Number of repetitions
 repetitions=5
 
-echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
+echo "Iteration,Threads,Elapsed Time(s),Computation Time(s),Write Time(s)" > "$out_csv"  # Clear and set header
 
 lst1=(1 2 4 8)
 lst2=({16..128..8})
@@ -37,8 +37,13 @@ for ((i=1; i<=$repetitions; i++)); do
         export OMP_NUM_THREADS=$threads
         export OMP_PLACES=cores
         export OMP_PROC_BIND=close
-        elapsed_time=$(mpirun -np 1 --map-by socket --bind-to socket ./build/mandelbrot 25000 25000 -1.5 -1.25 0.5 1.25 255 | grep "Elapsed time:" | awk '{print $3}')
-        echo "$i,$threads,$elapsed_time" >> "$out_csv"
+        output=$(mpirun -np 1 --map-by socket --bind-to socket ./build/mandelbrot 25000 25000 -1.5 -1.25 0.5 1.25 255)
+
+        elapsed_time=$(echo "$output" | grep "Elapsed time:" | awk '{print $3}')
+        computation_time=$(echo "$output" | grep "Computation time:" | awk '{print $3}')
+        write_time=$(echo "$output" | grep "Write time:" | awk '{print $3}')
+
+        echo "$i,$threads,$elapsed_time,$computation_time,$write_time" >> "$out_csv"
     done
 done
 

@@ -110,16 +110,22 @@ int main(int argc, char *argv[]) {
     // Close the file
     MPI_File_close(&fh);
 
+    double write_end_time, write_time;
+    write_end_time = MPI_Wtime();
+    write_time = write_end_time - computation_end_time;
+
+    // Print the elapsed time
+    if (rank == 0) {
+        end_time = MPI_Wtime();
+        printf("Computation time: %f seconds\n", computation_time);
+        printf("Write time: %f seconds\n", write_time);
+        printf("Elapsed time: %f seconds\n", end_time - start_time);
+    }
+
     if (rank == 0 && WRITE_PGM_IMAGE) {
         convert_bin_to_pgm(bin_filename, pgm_filename, nx, ny);
     }
     
-
     MPI_Finalize();
     return 0;
 }
-
-
-
-
-
