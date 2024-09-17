@@ -44,7 +44,7 @@ for ((i=1; i<=$repetitions; i++)); do
         rows=$(echo "$BASE_ROWS * sqrt($total_tasks)" | bc -l)
         cols=$(echo "$BASE_COLS * sqrt($total_tasks)" | bc -l)
         echo "Running iteration $i with $total_tasks MPI tasks."
-        output=$(mpirun -np $total_tasks ./build/mandelbrot $rows $cols -1.5 -1.25 0.5 1.25 255)
+        output=$(mpirun -np $total_tasks --map-by core ./build/mandelbrot $rows $cols -1.5 -1.25 0.5 1.25 255)
 
         elapsed_time=$(echo "$output" | grep "Elapsed time:" | awk '{print $3}')
         computation_time=$(echo "$output" | grep "Computation time:" | awk '{print $3}')
