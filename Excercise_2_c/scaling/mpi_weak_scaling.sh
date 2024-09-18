@@ -41,8 +41,8 @@ echo "Running MPI weak scaling."
 
 for ((i=1; i<=$repetitions; i++)); do
     for total_tasks in "${tasks_list[@]}"; do
-        rows=$(echo "$BASE_ROWS * sqrt($total_tasks)" | bc -l)
-        cols=$(echo "$BASE_COLS * sqrt($total_tasks)" | bc -l)
+        rows=$(echo "$BASE_ROWS * (sqrt($total_tasks)/1+1) " | bc -l)
+        cols=$(echo "$BASE_COLS * (sqrt($total_tasks)/1+1)" | bc -l)
         echo "Running iteration $i with $total_tasks MPI tasks."
         output=$(mpirun -np $total_tasks --map-by core --bind-to core ./build/mandelbrot $rows $cols -1.5 -1.25 0.5 1.25 255)
         elapsed_time=$(echo "$output" | grep "Elapsed time:" | awk '{print $3}')

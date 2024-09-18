@@ -44,12 +44,12 @@ echo "Running OpenMP weak scaling."
 for ((i=1; i<=$repetitions; i++)); do
     for threads in "${threads_list[@]}"; do
 
-        rows=$(echo "$BASE_ROWS * sqrt($threads)" | bc -l)
-        cols=$(echo "$BASE_COLS * sqrt($threads)" | bc -l)
+        rows=$(echo "$BASE_ROWS * (sqrt($threads)/1+1)" | bc -l)
+        cols=$(echo "$BASE_COLS * (sqrt($threads)/1+1)" | bc -l)
 
         echo "Running repetition $i with $threads OMP threads..."
         export OMP_NUM_THREADS=$threads
-        export OMP_PLACES=cores
+        export OMP_PLACES=hwthread
         export OMP_PROC_BIND=close
         elapsed_time=$(mpirun -np 1 --map-by socket --bind-to socket ./build/mandelbrot $cols $rows -1.5 -1.25 0.5 1.25 255 | grep "Elapsed time:" | awk '{print $3}')
 
