@@ -51,9 +51,6 @@ for ((i=1; i<=$repetitions; i++)); do
         rows_ceiling=$(echo "($rows + 0.999)/1" | bc -l | cut -d. -f1)
         cols_ceiling=$(echo "($cols + 0.999)/1" | bc -l | cut -d. -f1)
 
-        echo "Ceiling of rows: $rows_ceiling"
-        echo "Ceiling of cols: $cols_ceiling"
-
         echo "Running repetition $i with $threads OMP threads..."
         export OMP_NUM_THREADS=$threads
         export OMP_PLACES=hwthread
