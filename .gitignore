@@ -1,3 +1,4 @@
 figures/
-build/
+build/mandelbrot
 *.out
+*.bin

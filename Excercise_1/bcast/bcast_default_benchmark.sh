@@ -4,10 +4,9 @@
 #SBATCH --ntasks-per-node=24
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
-#SBATCH --nodelist=thin005,thin006
 #SBATCH --job-name=HPC_ex01_bcast_default
-#SBATCH --error=mpi_weak_scaling_%j.err
-#SBATCH --output=mpi_weak_scaling_%j.out
+#SBATCH --error=bcast_default_%j.err
+#SBATCH --output=bcast_default_%j.out
 #SBATCH --exclusive
 #SBATCH -A dssc
 

@@ -4,9 +4,9 @@
 #SBATCH --ntasks-per-node=24
 #SBATCH --time=02:00:00
 #SBATCH --partition=THIN
-#SBATCH --job-name=HPC_ex01_bcast_binomial
-#SBATCH --error=bcast_binomial_%j.err
-#SBATCH --output=bcast_binomial_%j.out
+#SBATCH --job-name=HPC_ex01_bcast_linear
+#SBATCH --error=bcast_linear_%j.err
+#SBATCH --output=bcast_linear_%j.out
 #SBATCH --exclusive
 #SBATCH -A dssc
 
