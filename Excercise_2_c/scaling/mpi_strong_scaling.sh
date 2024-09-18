@@ -20,7 +20,7 @@ mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 out_csv="./scaling/results/mpi_strong_scaling.csv"
 
 # Number of repetitions
-repetitions=5
+repetitions=3
 
 echo "Iteration,Total Tasks,Elapsed Time(s),Computation Time(s),Gathering Time(s)" > "$out_csv"  # Clear and set header
 

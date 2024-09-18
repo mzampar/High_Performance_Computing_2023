@@ -44,8 +44,15 @@ echo "Running OpenMP weak scaling."
 for ((i=1; i<=$repetitions; i++)); do
     for threads in "${threads_list[@]}"; do
 
-        rows=$(echo "$BASE_ROWS * (sqrt($threads)+1)" | bc -l)
-        cols=$(echo "$BASE_COLS * (sqrt($threads)+1)" | bc -l)
+        rows=$(echo "$BASE_ROWS * (sqrt($threads))" | bc -l)
+        cols=$(echo "$BASE_COLS * (sqrt($threads))" | bc -l)
+
+        # To get the ceiling of rows and cols
+        rows_ceiling=$(echo "($rows + 0.999)/1" | bc -l | cut -d. -f1)
+        cols_ceiling=$(echo "($cols + 0.999)/1" | bc -l | cut -d. -f1)
+
+        echo "Ceiling of rows: $rows_ceiling"
+        echo "Ceiling of cols: $cols_ceiling"
 
         echo "Running repetition $i with $threads OMP threads..."
         export OMP_NUM_THREADS=$threads
