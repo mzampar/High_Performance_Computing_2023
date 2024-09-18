@@ -3,7 +3,7 @@
 #include <mpi.h>
 #include <omp.h>
 #include <string.h>
-#define WRITE_IMAGE 1 // Compile with -DWRITE_IMAGE=1 to write the image
+#define WRITE_IMAGE 0 // Compile with -DWRITE_IMAGE=1 to write the image
 
 // Function to update the complex values zr and zi using the Mandelbrot equation
 void f_c(double *zr, double *zi, double cr, double ci) {
