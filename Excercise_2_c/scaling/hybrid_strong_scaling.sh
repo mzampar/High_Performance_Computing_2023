@@ -3,7 +3,6 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=8
 #SBATCH --cpus-per-task=16
-#SBATCH --ntasks-per-node=128
 #SBATCH --time=01:00:00
 #SBATCH --partition=EPYC
 #SBATCH --job-name=hybrid_strong_scaling
