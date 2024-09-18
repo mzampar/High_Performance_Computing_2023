@@ -8,7 +8,6 @@
 #SBATCH --job-name=hybrid_strong_scaling
 #SBATCH --error=hybrid_strong_scaling_%j.err
 #SBATCH --output=hybrid_strong_scaling_%j.out
-#SBATCH --exclusive
 #SBATCH -A dssc
 
 # Load modules
