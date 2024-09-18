@@ -46,7 +46,7 @@ for ((i=1; i<=$repetitions; i++)); do
             export OMP_PLACES=cores
             export OMP_PROC_BIND=close
             echo "Running iteration $i with $total_tasks MPI tasks and $total_threads threads."
-            output=$(mpirun -np $total_tasks --map-by core --bind-to core ./build/mandelbrot 25000 25000 -1.5 -1.25 0.5 1.25 255)
+            output=$(mpirun -np $total_tasks --map-by numa --bind-to numa ./build/mandelbrot 25000 25000 -1.5 -1.25 0.5 1.25 255)
             elapsed_time=$(echo "$output" | grep "Elapsed time:" | awk '{print $3}')
             computation_time=$(echo "$output" | grep "Computation time:" | awk '{print $3}')
             gathering_time=$(echo "$output" | grep "Gathering time:" | awk '{print $3}')        
