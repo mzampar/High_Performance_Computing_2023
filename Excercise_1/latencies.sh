@@ -12,31 +12,29 @@
 module load openMPI/4.1.6/gnu/14.2.1
 
 CORES_PER_NODE=24
-NODE1="thin009"
-NODE2="thin010"
+
+# Dynamically get node names assigned by SLURM
+NODE1=$(scontrol show hostname $SLURM_NODELIST | sed -n '1p')
+NODE2=$(scontrol show hostname $SLURM_NODELIST | sed -n '2p')
 
 OSU_LATENCY_EXEC="/u/dssc/mzampar/.local/libexec/osu-micro-benchmarks/mpi/pt2pt/osu_latency"
 
-
-OUTFILE="latency_results.csv"
-echo "Core1,Core2,Latency(us)" > $OUTFILE
-
 # Measure latencies within a single node
-echo "Measuring latencies within $NODE1..." >> $OUTFILE
+echo "Measuring latencies within $NODE1..."
 
 for ((i=0; i<$CORES_PER_NODE; i++)); do
     for ((j=i+1; j<$CORES_PER_NODE; j++)); do
         echo "Running latency between core $i and core $j on $NODE1..."
-        LATENCY=$(mpirun -np 2 --host thin001 --cpu-list $i,$j $OSU_LATENCY_EXEC)
+        mpirun -np 2 --host $NODE1:24 --cpu-list $i,$j $OSU_LATENCY_EXEC
     done
 done
 
-echo "Measuring latencies between $NODE1 and $NODE2..." >> $OUTFILE
+echo "Measuring latencies between $NODE1 and $NODE2..."
 
 for ((i=0; i<$CORES_PER_NODE; i++)); do
     for ((j=i; j<$CORES_PER_NODE; j++)); do
         echo "Running latency between core $i on $NODE1 and core $j on $NODE2..."
-        LATENCY=$(mpirun -np 2 --host $NODE1,$NODE2 --cpu-list $i,$j $OSU_LATENCY_EXEC)
+        mpirun -np 2 --host $NODE1:24,$NODE2:24 --cpu-list $i,$j $OSU_LATENCY_EXEC
     done
 done
 
