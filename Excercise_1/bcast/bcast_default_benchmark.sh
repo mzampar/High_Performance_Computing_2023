@@ -19,11 +19,11 @@ np_values=$(seq 2 1 48)
 map_values="core socket node"
 
 # Define filepaths
-src_path="/u/dssc/mzampar/.local/libexec/osu-micro-benchmarks/mpi/collective/"
+src_path="../../osu-micro-benchmarks-7.3/c/mpi/collective/blocking/"
 out_csv="/u/dssc/mzampar/High_Performance_Computing_2023/Excercise_1/bcast/results/bcast_default.csv"
 
 # Create the CSV file with header
-echo "Algorithm,Allocation,Processes,MessageSize,MedianLatency, MinLatency, MaxLatency" > $out_csv
+echo "Algorithm,Allocation,Processes,MessageSize,Latency, MinLatency, MaxLatency" > $out_csv
 
 # Iterate over map and np values
 for map in $map_values; do
