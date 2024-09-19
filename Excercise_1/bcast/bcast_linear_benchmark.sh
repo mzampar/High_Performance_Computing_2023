@@ -20,7 +20,7 @@ map_values="core socket node"
 
 # Define filepaths
 src_path="/u/dssc/mzampar/.local/libexec/osu-micro-benchmarks/mpi/collective/"
-out_csv="/u/dssc/mzampar/High_Performance_Computing_2023/Excercise_1/bcast/results/bcast_binomial.csv"
+out_csv="/u/dssc/mzampar/High_Performance_Computing_2023/Excercise_1/bcast/results/bcast_linear.csv"
 
 # Create the CSV file with header
 echo "Algorithm,Allocation,Processes,MessageSize,MedianLatency, MinLatency, MaxLatency" > $out_csv
