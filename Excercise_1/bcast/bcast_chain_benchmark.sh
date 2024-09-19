@@ -7,6 +7,7 @@
 #SBATCH --job-name=HPC_ex01_bcast_chain
 #SBATCH --error=bcast_chain_%j.err
 #SBATCH --output=bcast_chain_%j.out
+#SBATCH --nodelist=thin009,thin010
 #SBATCH --exclusive
 #SBATCH -A dssc
 
@@ -14,7 +15,7 @@
 module load openMPI/4.1.6/gnu/14.2.1
 
 # Define the range of np values
-np_values=$(seq 2 1 48)
+np_values=$(seq 2 2 48)
 # Define the range of map values
 map_values="core socket node"
 
