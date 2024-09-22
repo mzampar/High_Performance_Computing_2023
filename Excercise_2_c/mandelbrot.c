@@ -98,6 +98,7 @@ int main(int argc, char *argv[]) {
                 local_matrix[j * nx + i] = mandelbrot(cr, ci, I_max);
             }
         }
+        // printf("Thread %d of rank %d finished\n", omp_get_thread_num(), rank);
     }
 
     MPI_Barrier(MPI_COMM_WORLD);

@@ -31,7 +31,7 @@ echo "Running MPI weak scaling."
 for i in $(seq 1 $iterations); do
     for total_tasks in "${tasks_list[@]}"; do
         for total_threads in "${threads_list[@]}"; do
-            export OMP_NUM_THREADS=total_threads
+            export OMP_NUM_THREADS=$total_threads
             export OMP_PLACES=cores
             export OMP_PROC_BIND=close
             echo "Running iteration $i with $total_tasks MPI tasks and $total_threads threads."
