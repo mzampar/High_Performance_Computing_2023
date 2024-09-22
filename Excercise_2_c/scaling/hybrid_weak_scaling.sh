@@ -27,8 +27,8 @@ echo "Iteration,Total Tasks,Total Threads,Elapsed Time(s),Computation Time(s),Ga
 # Constant amout of work per worker: C = problem size / number of workers
 # Therefore, problem size = C * number of workers 
 
-BASE_ROWS=2000
-BASE_COLS=2000
+BASE_ROWS=1000
+BASE_COLS=1000
 
 iterations=5
 
