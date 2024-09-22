@@ -24,7 +24,7 @@ src_path="../osu-micro-benchmarks-7.3/c/mpi/collective/blocking/"
 out_csv="/u/dssc/mzampar/High_Performance_Computing_2023/Excercise_1/barrier/results/barrier_tree.csv"
 
 # Create the CSV file with header
-echo "Algorithm,Allocation,Processes,Latency, MinLatency, MaxLatency" > $out_csv
+echo "Algorithm,Allocation,Processes,Latency" > $out_csv
 
 # Iterate over map and np values
 for map in $map_values; do
@@ -32,6 +32,6 @@ for map in $map_values; do
     # Run the mpirun command
     echo "   Benchmarking Tree with map=$map and np=$np"
     mpirun -np $np -map-by $map --mca coll_tuned_use_dynamic_rules true --mca coll_tuned_bcast_algorithm 6 ${src_path}osu_barrier -x 1000 -i 10000 -f | tail -n 1 \
-    | awk -v np="$np" -v map="$map" '{printf "Tree,%s,%s,%s,%s,%s,%s\n",map,np,$1,$2,$3}' | sed 's/,$//' >> $out_csv
+    | awk -v np="$np" -v map="$map" '{printf "Tree,%s,%s,%s\n",map,np,$1}' | sed 's/,$//' >> $out_csv
   done
 done

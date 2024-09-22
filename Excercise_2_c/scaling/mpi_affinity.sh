@@ -30,8 +30,8 @@ lst2=({16..256..16})
 tasks_list=("${lst1[@]}" "${lst2[@]}")
 
 # Define different mapping and binding strategies
-mapping_list=("node" "socket" "core" "hwthread")
-binding_list=("none" "core" "socket" "hwthread")
+mapping_list=("node" "socket" "core" "hwthread" "numa")
+binding_list=("none" "core" "socket" "hwthread" "numa")
 
 echo "Running MPI strong scaling with different mappings and bindings."
 
