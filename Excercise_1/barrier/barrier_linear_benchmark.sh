@@ -32,6 +32,6 @@ for map in $map_values; do
     # Run the mpirun command
     echo "   Benchmarking Linear with map=$map and np=$np"
     mpirun -np $np -map-by $map --mca coll_tuned_use_dynamic_rules true --mca coll_tuned_bcast_algorithm 1 ${src_path}osu_barrier -x 1000 -i 10000 -f | tail -n 1 \
-    | awk -v np="$np" -v map="$map" '{printf "Linear,%s,%s,%s\n",map,np,$1}' | sed 's/,$//' >> $out_csv
+    | awk -v np="$np" -v map="$map" '{printf "Linear,%s,%s,%s\n",map,np,$1}' >> $out_csv
   done
 done
