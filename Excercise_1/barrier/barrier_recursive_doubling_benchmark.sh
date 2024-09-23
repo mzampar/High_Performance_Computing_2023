@@ -7,7 +7,6 @@
 #SBATCH --job-name=HPC_ex01_barrier_recursive_doubling
 #SBATCH --error=barrier_recursive_doubling_%j.err
 #SBATCH --output=barrier_recursive_doubling_%j.out
-#SBATCH --nodelist=thin009,thin010
 #SBATCH --exclusive
 #SBATCH -A dssc
 

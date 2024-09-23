@@ -7,7 +7,6 @@
 #SBATCH --job-name=HPC_ex01_barrier_tree
 #SBATCH --error=barrier_tree_%j.err
 #SBATCH --output=barrier_tree_%j.out
-#SBATCH --nodelist=thin009,thin010
 #SBATCH --exclusive
 #SBATCH -A dssc
 

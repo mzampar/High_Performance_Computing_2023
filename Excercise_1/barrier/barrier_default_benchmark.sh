@@ -7,7 +7,6 @@
 #SBATCH --job-name=HPC_ex01_barrier_default
 #SBATCH --error=barrier_default_%j.err
 #SBATCH --output=barrier_default_%j.out
-#SBATCH --nodelist=thin009,thin010
 #SBATCH --exclusive
 #SBATCH -A dssc
 
