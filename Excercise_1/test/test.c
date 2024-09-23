@@ -6,9 +6,7 @@
 
 // function to print hello from each process
 void print_hello(int rank, int size) {
-    char hostname[256];
-    gethostname(hostname, sizeof(hostname));
-    printf("Hello from process %d of %d on %s\n", rank, size, hostname);
+    printf("Hello from process %d\n", rank);
 }
 
 int main (int argc, char *argv[]) {
