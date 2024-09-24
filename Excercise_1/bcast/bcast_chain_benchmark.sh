@@ -7,7 +7,6 @@
 #SBATCH --job-name=HPC_ex01_bcast_chain
 #SBATCH --error=bcast_chain_%j.err
 #SBATCH --output=bcast_chain_%j.out
-#SBATCH --nodelist=thin009,thin010
 #SBATCH --exclusive
 #SBATCH -A dssc
 
