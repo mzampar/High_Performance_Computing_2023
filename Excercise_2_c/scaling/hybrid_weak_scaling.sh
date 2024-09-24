@@ -21,9 +21,6 @@ out_csv="./scaling/results/hybrid_weak_scaling.csv"
 
 echo "Iteration,Total Tasks,Total Threads,Elapsed Time(s),Computation Time(s),Gathering Time(s)" > "$out_csv"  # Clear and set header
 
-# Number of OpenMP threads
-
-
 # Constant amout of work per worker: C = problem size / number of workers
 # Therefore, problem size = C * number of workers 
 

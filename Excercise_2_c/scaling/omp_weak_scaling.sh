@@ -33,7 +33,7 @@ repetitions=5
 BASE_ROWS=2000
 BASE_COLS=2000
 
-echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
+echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"
 
 lst1=(1 2 4 8)
 lst2=({16..128..8})
@@ -43,20 +43,16 @@ echo "Running OpenMP weak scaling."
 
 for ((i=1; i<=$repetitions; i++)); do
     for threads in "${threads_list[@]}"; do
-
         rows=$(echo "$BASE_ROWS * (sqrt($threads))" | bc -l)
         cols=$(echo "$BASE_COLS * (sqrt($threads))" | bc -l)
-
         # To get the ceiling of rows and cols
         rows_ceiling=$(echo "($rows + 0.999)/1" | bc -l | cut -d. -f1)
         cols_ceiling=$(echo "($cols + 0.999)/1" | bc -l | cut -d. -f1)
-
         echo "Running repetition $i with $threads OMP threads..."
         export OMP_NUM_THREADS=$threads
         export OMP_PLACES=hwthread
         export OMP_PROC_BIND=close
         elapsed_time=$(mpirun -np 1 --map-by socket --bind-to socket ./build/mandelbrot $cols $rows -1.5 -1.25 0.5 1.25 255 | grep "Elapsed time:" | awk '{print $3}')
-
         echo "$i,$threads,$elapsed_time" >> "$out_csv"
     done
 done

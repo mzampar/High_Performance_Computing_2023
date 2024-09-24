@@ -22,7 +22,7 @@ out_csv="./scaling/results/mpi_weak_scaling.csv"
 # Number of repetitions
 repetitions=3
 
-echo "Iteration,Total Tasks,Elapsed Time(s),Computation Time(s),Gathering Time(s)" > "$out_csv"  # Clear and set header
+echo "Iteration,Total Tasks,Elapsed Time(s),Computation Time(s),Gathering Time(s)" > "$out_csv"
 
 # Number of OpenMP threads
 export OMP_NUM_THREADS=1

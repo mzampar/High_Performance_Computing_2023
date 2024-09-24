@@ -19,7 +19,7 @@ mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 # Output file for storing results
 out_csv="./scaling/results/hybrid_strong_scaling.csv"
 
-echo "Iteration,Total Tasks,Total Threads,Elapsed Time(s),Computation Time(s),Gathering Time(s)" > "$out_csv"  # Clear and set header
+echo "Iteration,Total Tasks,Total Threads,Elapsed Time(s),Computation Time(s),Gathering Time(s)" > "$out_csv"
 
 iterations=5
 
@@ -43,6 +43,5 @@ for i in $(seq 1 $iterations); do
         done
     done
 done
-
 
 echo "Execution completed. Results saved to $out_csv"

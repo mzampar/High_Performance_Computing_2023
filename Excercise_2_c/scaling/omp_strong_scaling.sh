@@ -27,7 +27,7 @@ out_csv="./scaling/results/omp_strong_scaling.csv"
 # Number of repetitions
 repetitions=5
 
-echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"  # Clear and set header
+echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"
 
 lst1=(1 2 4 8)
 lst2=({16..128..8})

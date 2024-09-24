@@ -24,7 +24,7 @@ mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 # Output file for storing results
 out_csv="./scaling/results/omp_affinity.csv"
 
-echo "Threads,OMP_PLACES,OMP_PROC_BIND,Elapsed Time(s),Computation Time(s),Gathering Time(s)" > "$out_csv"  # Clear and set header
+echo "Threads,OMP_PLACES,OMP_PROC_BIND,Elapsed Time(s),Computation Time(s),Gathering Time(s)" > "$out_csv"
 
 # List of thread counts and affinities to test
 threads_list=(8 16 32 64)
@@ -32,7 +32,6 @@ affinity_list=("cores" "sockets" "threads" "none")
 bind_list=("close" "spread" "none")
 
 echo "Running OpenMP strong scaling with different thread affinities."
-
 
 for threads in "${threads_list[@]}"; do
     for places in "${affinity_list[@]}"; do
@@ -42,11 +41,9 @@ for threads in "${threads_list[@]}"; do
             export OMP_PLACES=$places
             export OMP_PROC_BIND=$bind
             output=$(mpirun -np 1 --map-by socket --bind-to socket ./build/mandelbrot 20000 20000 -1.5 -1.25 0.5 1.25 255)
-
             elapsed_time=$(echo "$output" | grep "Elapsed time:" | awk '{print $3}')
             computation_time=$(echo "$output" | grep "Computation time:" | awk '{print $3}')
             write_time=$(echo "$output" | grep "Gathering time:" | awk '{print $3}')
-
             echo "$threads,$places,$bind,$elapsed_time,$computation_time,$write_time" >> "$out_csv"
         done
     done

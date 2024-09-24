@@ -1,16 +1,5 @@
-Cozzini Project
+# Analysis of the performance of different MPI Collective Operations algorithms
 
+This project consists of the analysis of the performance of different algorithms for two collective operations, Broadcast and Barrier, on the ORFEO architecture.
 
-module load openMPI/4.1.5/icc/2021.7.1
-
-
-mkdir $HOME/.local/programs
-cd programs
-wget https://mvapich.cse.ohio-state.edu/download/mvapich/osu-micro-benchmarks-7.3.tar.gz
-
-./configure —prefix=/u/dssc/mzampar/.local/modules CC=/opt/programs/openMPI/4.1.5/bin/mpicc CXX=/opt/programs/openMPI/4.1.5/bin/mpicxx
-
-
-
-cd bcast/bcast_linear
-sbatch bcast_linear_getdata.sh
+The measurements were taken leveraging the OSU Benchmark, available at https://mvapich.cse.ohio-state.edu/benchmarks/.
