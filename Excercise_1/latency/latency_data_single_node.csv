@@ -1,4 +1,4 @@
-Core_1,Core_2,Message_Size,Latency
+Core 1,Core 2,Message Size,Latency
 0,1,1,0.21
 0,1,2,0.2
 0,1,4,0.2
