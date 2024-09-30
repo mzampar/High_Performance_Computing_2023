@@ -32,14 +32,14 @@ This project aims to:
 
 ### Flat Tree Algorithm
 - Single-level tree topology.
-- Root node transmits to P-1 child nodes.
+- Root node transmits to $P-1$ child nodes, without segmentation.
 
 ### Chain Tree Algorithm
 - Internal nodes have one child.
 - Messages are split into segments, transmitted in a pipeline.
 
 ### Binary Tree Algorithm
-- Internal process has two children.
+- Internal process has two children, then $P = 2^H -1$, assuming the tree is complete, with $H=\log_2(P+1)$ the height of the tree.
 - Segmentation is used to improve communication parallelism.
 
 ---
@@ -84,7 +84,7 @@ This project aims to:
 
 # Performance Models
 
-Linear regression models were used to estimate the latency surface, varying the number of processes and message sizes.
+
 
 ![](./Excercise_1/bcast/results/figures/model.png)
 
@@ -93,31 +93,34 @@ Linear regression models were used to estimate the latency surface, varying the 
 
 # Conclusion
 
-- The default algorithm doesn't always choose the best algorithm to perform the broadcast.
+The default algorithm doesn't always choose the best algorithm to perform the broadcast, expecially for node allocation, large message size and many processes, with a remarkable difference.
 
 ---
 
 # Barrier Algorithms analysed
 
 ### Linear: 
-All nodes report to a root.
+- All nodes report to a preselected root
+- Linear communication steps.
 
 ### Tree: 
-Hierarchical synchronization in a tree-like structure.
+- Hierarchical synchronization in a tree-like structure.
+- Logarithmic communication steps.
 
 ### Recursive Doubling: 
-Logarithmic communication steps, optimal for powers of 2.
+- Optimal for powers of 2. At step $k$, node $r$ exchanges a message with node $(r \texttt{XOR} 2^k)$.
+- Logarithmic communication steps.
 
 ---
 
-## Latency against number of processes (fixing the allocation)
+## Latency against number of processes (Fixed allocation)
 
 ![](./Excercise_1/barrier/results/figures/latency_vs_processes.png)
 
 
 ---
 
-## Latency against number of processes (fixing the algorithm)
+## Latency against number of processes (Fixed algorithm)
 
 ![](./Excercise_1/barrier/results/figures/latency_fix_alg.png)
 
@@ -137,4 +140,4 @@ Logarithmic communication steps, optimal for powers of 2.
 
 # Conclusion
 
-- OpenMPI's default algorithm doesn't always choose the optimal one in terms of latency, but in the case of `MPI_Barrier` the difference is not remarkable.
+OpenMPI's default algorithm doesn't always choose the optimal algorithm in terms of latency, but in the case of `MPI_Barrier` the difference is not remarkable.
