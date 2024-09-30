@@ -20,7 +20,7 @@ mpicc -O3 -march=native -o ./build/mandelbrot mandelbrot.c -lm -fopenmp
 out_csv="./scaling/results/mpi_weak_scaling.csv"
 
 # Number of repetitions
-repetitions=3
+repetitions=5
 
 echo "Iteration,Total Tasks,Elapsed Time(s),Computation Time(s),Gathering Time(s)" > "$out_csv"
 
@@ -44,7 +44,7 @@ for ((i=1; i<=$repetitions; i++)); do
         rows=$(echo "$BASE_ROWS * (sqrt($total_tasks)+1) " | bc -l)
         cols=$(echo "$BASE_COLS * (sqrt($total_tasks)+1)" | bc -l)
         echo "Running iteration $i with $total_tasks MPI tasks."
-        output=$(mpirun -np $total_tasks --map-by core --bind-to core ./build/mandelbrot $rows $cols -1.5 -1.25 0.5 1.25 65535)
+        output=$(mpirun -np $total_tasks --map-by core --bind-to core ./build/mandelbrot $rows $cols -1.5 -1.25 0.5 1.25 10000)
         elapsed_time=$(echo "$output" | grep "Elapsed time:" | awk '{print $3}')
         computation_time=$(echo "$output" | grep "Computation time:" | awk '{print $3}')
         gathering_time=$(echo "$output" | grep "Gathering time:" | awk '{print $3}')        
