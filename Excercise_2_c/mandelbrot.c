@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Allocate memory for local matrix
-    char *local_matrix = (char *) malloc((my_rows + my_remainder) * nx * sizeof(char));
+    short int *local_matrix = (short int *) malloc((my_rows + my_remainder) * nx * sizeof(short int));
 
     // Barrier to synchronize all processes and measure the elapsed time
     MPI_Barrier(MPI_COMM_WORLD);
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
     computation_end_time = MPI_Wtime();
     computation_time = computation_end_time - computation_start_time;
 
-    char *gathered_matrix = NULL;
+    short int *gathered_matrix = NULL;
 
     double gather_start_time, gather_end_time, gathering_time;
     gather_start_time = MPI_Wtime();
@@ -114,12 +114,12 @@ int main(int argc, char *argv[]) {
     if (size > 1) {
         // Allocate memory for the gathered matrix on rank 0
         if (rank == 0) {
-            gathered_matrix = (char *) malloc(ny * nx * sizeof(char));
+            gathered_matrix = (short int *) malloc(ny * nx * sizeof(short int));
         }
         for (int j = 0; j < my_rows; j++) {
             // Gather the row from each process into the gathered_matrix
-            MPI_Gather(local_matrix + j * nx, nx, MPI_CHAR,
-                    gathered_matrix + j * size * nx, nx, MPI_CHAR,
+            MPI_Gather(local_matrix + j * nx, nx, MPI_SHORT,
+                    gathered_matrix + j * size * nx, nx, MPI_SHORT,
                     0, MPI_COMM_WORLD); 
         }
         // Cannot simply use a for with j < my_rows + my_remainder because the MPI_Gather 
@@ -133,8 +133,8 @@ int main(int argc, char *argv[]) {
 
         // Only processes with `my_remainder == 1` will have `sub_comm` != MPI_COMM_NULL
         if (sub_comm != MPI_COMM_NULL) {
-           MPI_Gather(local_matrix + my_rows * nx, nx, MPI_CHAR,
-                        gathered_matrix + my_rows * size * nx, nx, MPI_CHAR,
+           MPI_Gather(local_matrix + my_rows * nx, nx, MPI_SHORT,
+                        gathered_matrix + my_rows * size * nx, nx, MPI_SHORT,
                         0, sub_comm);
             MPI_Comm_free(&sub_comm);
         }
@@ -157,10 +157,10 @@ int main(int argc, char *argv[]) {
             // Set the number of different grey levels to 50
             fprintf(file, "P5\n%d %d\n255\n", nx, ny);
             if (size > 1) {
-                fwrite(gathered_matrix, sizeof(char), nx * ny, file);
+                fwrite(gathered_matrix, sizeof(short int), nx * ny, file);
                 free(gathered_matrix);
             } else {
-                fwrite(local_matrix, sizeof(char), nx * ny, file);
+                fwrite(local_matrix, sizeof(short int), nx * ny, file);
                 free(local_matrix);
             }
             fclose(file);

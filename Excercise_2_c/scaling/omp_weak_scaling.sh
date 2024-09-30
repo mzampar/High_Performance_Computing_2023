@@ -30,8 +30,8 @@ repetitions=5
 # Constant amout of work per worker: C = problem size / number of workers
 # Therefore, problem size = C * number of workers 
 
-BASE_ROWS=2000
-BASE_COLS=2000
+BASE_ROWS=1000
+BASE_COLS=1000
 
 echo "Iteration,Threads,Elapsed Time(s)" > "$out_csv"
 
@@ -52,7 +52,7 @@ for ((i=1; i<=$repetitions; i++)); do
         export OMP_NUM_THREADS=$threads
         export OMP_PLACES=hwthread
         export OMP_PROC_BIND=close
-        elapsed_time=$(mpirun -np 1 --map-by socket --bind-to socket ./build/mandelbrot $cols $rows -1.5 -1.25 0.5 1.25 255 | grep "Elapsed time:" | awk '{print $3}')
+        elapsed_time=$(mpirun -np 1 --map-by socket --bind-to socket ./build/mandelbrot $cols $rows -1.5 -1.25 0.5 1.25 65535 | grep "Elapsed time:" | awk '{print $3}')
         echo "$i,$threads,$elapsed_time" >> "$out_csv"
     done
 done

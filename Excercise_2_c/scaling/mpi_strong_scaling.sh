@@ -36,7 +36,7 @@ echo "Running MPI strong scaling."
 for ((i=1; i<=$repetitions; i++)); do
     for total_tasks in "${tasks_list[@]}"; do
         echo "Running iteration $i with $total_tasks MPI tasks."
-        output=$(mpirun -np $total_tasks --map-by core --bind-to core ./build/mandelbrot 25000 25000 -1.5 -1.25 0.5 1.25 255)
+        output=$(mpirun -np $total_tasks --map-by core --bind-to core ./build/mandelbrot 10000 10000 -1.5 -1.25 0.5 1.25 65535)
         elapsed_time=$(echo "$output" | grep "Elapsed time:" | awk '{print $3}')
         computation_time=$(echo "$output" | grep "Computation time:" | awk '{print $3}')
         gathering_time=$(echo "$output" | grep "Gathering time:" | awk '{print $3}')        

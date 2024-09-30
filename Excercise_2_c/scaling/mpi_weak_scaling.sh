@@ -30,8 +30,8 @@ export OMP_NUM_THREADS=1
 # Constant amout of work per worker: C = problem size / number of workers
 # Therefore, problem size = C * number of workers 
 
-BASE_ROWS=2000
-BASE_COLS=2000
+BASE_ROWS=1000
+BASE_COLS=1000
 
 lst1=(1 2 4 8)
 lst2=({16..256..8})
@@ -44,7 +44,7 @@ for ((i=1; i<=$repetitions; i++)); do
         rows=$(echo "$BASE_ROWS * (sqrt($total_tasks)+1) " | bc -l)
         cols=$(echo "$BASE_COLS * (sqrt($total_tasks)+1)" | bc -l)
         echo "Running iteration $i with $total_tasks MPI tasks."
-        output=$(mpirun -np $total_tasks --map-by core --bind-to core ./build/mandelbrot $rows $cols -1.5 -1.25 0.5 1.25 255)
+        output=$(mpirun -np $total_tasks --map-by core --bind-to core ./build/mandelbrot $rows $cols -1.5 -1.25 0.5 1.25 65535)
         elapsed_time=$(echo "$output" | grep "Elapsed time:" | awk '{print $3}')
         computation_time=$(echo "$output" | grep "Computation time:" | awk '{print $3}')
         gathering_time=$(echo "$output" | grep "Gathering time:" | awk '{print $3}')        
