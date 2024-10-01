@@ -141,3 +141,7 @@ The default algorithm doesn't always choose the best algorithm to perform the br
 # Conclusion
 
 OpenMPI's default algorithm doesn't always choose the optimal algorithm in terms of latency, but in the case of `MPI_Barrier` the difference is not remarkable.
+
+---
+
+# Thanks for your attention!

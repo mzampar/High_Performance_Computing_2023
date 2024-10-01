@@ -15,6 +15,8 @@
 # Therefore, 64 threads per node because there are 64 cores per socket in an epyc node
 # We use 128 threads to check how SMT works
 
+# that is wrong :(, I could have used both sockets.
+
 # Load modules
 module load openMPI/4.1.6/gnu/14.2.1
 

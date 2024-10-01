@@ -17,8 +17,8 @@ October 01, 2024
 - The **Mandelbrot Set** is defined as the set of points $c$ such that the sequence $z_{n+1} = z_n^2 + c$, with $z_0=0$, is bounded. The simplest condition to guarantee that is $|z_n| < 2$.
 
 - The goal is to parallelize the computation of the Mandelbrot Set  with an hybrid `C` code using:
-  - **MPI** (Message Passing Interface) for distributed memory parallelism
-  - **OpenMP** (Open MultiProcessing) for shared memory parallelism
+  - **MPI** (Message Passing Interface) for distributed memory parallelism;
+  - **OpenMP** (Open MultiProcessing) for shared memory parallelism.
   
 ---
 
@@ -66,7 +66,7 @@ October 01, 2024
 
 - Strong scaling performed with `nx=ny=25000`.
 
-- Weak scaling performed with $C = W / P = (2000 / \sqrt(P))  * (2000 /  \sqrt(P))$, with $W,P$ amount of work and number of processes.
+- Weak scaling performed with $C = W / P = (2000 / \sqrt P)  * (2000 /  \sqrt P)$, with $W,P$ amount of work and number of processes.
 
 ---
 
@@ -82,7 +82,7 @@ October 01, 2024
 ---
 
 ![bg vertical right width:450px](./Excercise_2_c/scaling/results/figures/mpi_weak_scaling.png)
-![bg width:400px](./Excercise_2_c/scaling/results/figures/mpi_weak_scaling_gathering.png)
+![bg width:450px](./Excercise_2_c/scaling/results/figures/mpi_weak_scaling_gathering.png)
 
 ## MPI Weak Scaling
 
@@ -126,3 +126,7 @@ October 01, 2024
 - We tested **Hybrid MPI+OpenMP scaling** using both processes and threads.
 - The best configuration achieved an execution time of 1.61 s (99% reduction).
 - The issues noticed in the MPI weak scaling were found also in the Hybrid scaling, but fixing the number of processes and increasing the number of threads we got almost constant execution times.
+
+---
+
+# Thanks for your attention!
